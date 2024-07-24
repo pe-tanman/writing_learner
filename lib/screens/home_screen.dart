@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:writing_learner/themes/app_color.dart';
-import 'package:writing_learner/screen/question_view.dart';
+import 'package:writing_learner/screens/question_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  static final routeName = 'home-screen';
+  static const routeName = 'home-screen';
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
