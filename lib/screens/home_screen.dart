@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
+import 'package:writing_learner/screens/proverb_question_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -57,24 +58,24 @@ class HorizontalContents extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildItem('AI旧帝大', '和文英訳',
-                     'lib/assets/ai_image.jpeg', context),
+                     'lib/assets/ai_image.jpeg', QuestionView.routeName, context),
                 _buildItem('ことわざ', '表現',
-                    'lib/assets/ai_image.jpeg', context),
+                    'lib/assets/ai_image.jpeg', ProverbQuestionView.routeName, context),
                _buildItem('構文150', '構文',
-                    'lib/assets/ai_image.jpeg', context),
+                    'lib/assets/ai_image.jpeg', ProverbQuestionView.routeName, context),
               ]),
         ],
       ),
     );
   }
 
-  Widget _buildItem(String title, String discription, var imagePath, var context) {
+  Widget _buildItem(String title, String discription, var imagePath,var route, var context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(QuestionView.routeName);
+            Navigator.of(context).pushNamed(route);
           },
           child: Container(
             decoration: BoxDecoration(
