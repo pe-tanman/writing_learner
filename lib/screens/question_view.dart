@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
 
-import 'package:writing_learner/provider/question_provider2.dart';
 
 class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
@@ -110,7 +108,6 @@ class QuestionViewState extends ConsumerState<QuestionView> {
             )
           : PageView(
               scrollDirection: Axis.horizontal,
-              onPageChanged: (int page) async {
               onPageChanged: (int page) async {
                 currentPage = page - 1;
                 await preloadNextPage(ref, currentPage + 1);
