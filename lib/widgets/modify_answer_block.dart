@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/question_provider.dart';
 
-class ModifiedAnswerRichText extends StatefulWidget {
-  const ModifiedAnswerRichText(
-      {Key? key, required this.question, required this.answer})
-      : super(key: key);
-  final String answer;
-  final String question;
+class ModifiedAnswerRichText extends ConsumerWidget {
+  final int page;
 
-  @override
-  State<ModifiedAnswerRichText> createState() => ModifiedAnswerRichTextState();
-}
+  // コンストラクタで引数を受け取る
+  ModifiedAnswerRichText({super.key, required this.page});
 
-class ModifiedAnswerRichTextState extends State<ModifiedAnswerRichText> {
-  String answerSentence = '', questionSentence = '', modifiedSentence = '';
-  bool isInit = true;
   bool isLoading = true;
+
   int _findNextMatch(
       List<String> words1, List<String> words2, int start1, int start2) {
     for (int i = start2; i < words2.length; i++) {
@@ -26,7 +20,7 @@ class ModifiedAnswerRichTextState extends State<ModifiedAnswerRichText> {
     return -1;
   }
 
-  List<InlineSpan> spans() {
+  List<InlineSpan> spans(String answerSentence, String modifiedSentence) {
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     List<InlineSpan> spans = [];
@@ -73,25 +67,17 @@ class ModifiedAnswerRichTextState extends State<ModifiedAnswerRichText> {
     return spans;
   }
 
-Future<void> generateModifiedAnswer() async{
-  modifiedSentence = await GenerativeService().generateModifiedAnswer(questionSentence, answerSentence);
-  isLoading = false;
-}
-@override
-  Widget build(BuildContext context) {
-    if(isInit){
-      answerSentence = widget.answer;
-      questionSentence = widget.question;
-      generateModifiedAnswer();
-      isInit = false;
-      }
-
-    return isLoading? const CircularProgressIndicator(): 
-    RichText(
-      text: TextSpan(
-        style: DefaultTextStyle.of(context).style,
-        children: spans(),
-      ),
-    );
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final questionData = ref.watch(questionNotifierProvider)[page];
+    isLoading = questionData.modified == '';
+    return isLoading
+        ? const CircularProgressIndicator()
+        : RichText(
+            text: TextSpan(
+              style: DefaultTextStyle.of(context).style,
+              children: spans(questionData.answer, questionData.modified),
+            ),
+          );
   }
 }

@@ -1,52 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:writing_learner/screens/question_screen.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/provider/question_provider.dart';
+import 'package:writing_learner/widgets/modify_answer_block.dart';
 
-class QuestionView extends StatefulWidget {
+class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
   static const routeName = 'question-view';
   @override
-  State<QuestionView> createState() => QuestionViewState();
+  ConsumerState<QuestionView> createState() => QuestionViewState();
 }
 
-class QuestionViewState extends State<QuestionView> {
+class QuestionViewState extends ConsumerState<QuestionView> {
   List<Widget> questionPages = [const QuestionStartScreen()];
   var isInit = true;
   var isLoading = true;
+  int currentPage = 0;
 
-  var availableQuestionPages = [];
+  List<Widget> availableQuestionPages = [];
 
-  Future<void> initPages(int page) async {
-    /*var japaneseSentences = [
-      "近年、環境問題に対する意識が世界中で高まり、再生可能エネルギーの重要性が強調されています。",
-      "古代の哲学者たちは、人間の存在意義について多くの議論を交わし、その影響は現代にも及んでいます。",
-      "科学技術の進歩により、私たちの生活は劇的に変化し、医療や通信の分野で特に顕著です。",
-      "文学作品を通じて異文化理解を深めることは、国際社会における重要な課題の一つです。",
-      "歴史的な出来事の背景を理解することで、現代の社会問題をより深く洞察することが可能です。"
-    ];*/
-
-    for (int i = 0; i < 5; i++) {
-      String questionSentence = await GenerativeService().generateText('大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-      questionPages.add(QuestionScreen(question: questionSentence));
-    }
-    questionPages.add(const QuestionStartScreen());
-    availableQuestionPages.add(questionPages[0]);
-    availableQuestionPages.add(questionPages[1]);
+  Future<void> initPages(WidgetRef ref) async {
+    availableQuestionPages.add(const QuestionStartScreen());
+    await preloadNextPage(ref, 0);
+    isInit = false;
     setState(() {
       isLoading = false;
     });
   }
 
-  void preloadNextPage(int page) {
-    availableQuestionPages.add(questionPages[page + 1]);
+  Future<void> preloadNextPage(WidgetRef ref, int nextPage) async {
+    String questionSentence = await GenerativeService()
+        .generateText('大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
+    ref.read(questionNotifierProvider.notifier).addQuestion(questionSentence);
+    availableQuestionPages.add(questionPage(ref, nextPage));
+  }
+
+  var answerSentence = '';
+  bool answered = false;
+
+  Widget questionPage(WidgetRef ref, int page) {
+    final questionData = ref.watch(questionNotifierProvider)[page];
+    final notifier = ref.read(questionNotifierProvider.notifier);
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(
+                height: 30,
+              ),
+              Text('問題文:\n${questionData.question}'),
+              const SizedBox(height: 15),
+              TextField(
+                autocorrect: false,
+                maxLines: null,
+                enabled: !answered,
+                enableSuggestions: false,
+                decoration: const InputDecoration(hintText: "回答"),
+                onChanged: (value) {
+                  answerSentence = value;
+                },
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragEnd: (detail) {
+                  answered = true;
+                  notifier.addAnswer(page, answerSentence);
+                },
+                child: Container(
+                  height: 200,
+                  width: 500,
+                  color: Colors.grey,
+                  child: Center(
+                      child: Column(
+                    children: [
+                      if (answered) ModifiedAnswerRichText(page: page),
+                      if (answered)
+                        Text(
+                            '正解語数 :${questionData.correctWordsCount.toString()}')
+                    ],
+                  )),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (isInit) {
-      preloadNextPage(1);
-      isInit = false;
+      initPages(ref);
     }
     return Scaffold(
       appBar: AppBar(
@@ -60,8 +113,11 @@ class QuestionViewState extends State<QuestionView> {
             )
           : PageView(
               scrollDirection: Axis.horizontal,
-              onPageChanged: (int page) {},
-              children: questionPages,
+              onPageChanged: (int page) async{
+                currentPage = page - 1;
+                await preloadNextPage(ref, currentPage + 1);
+              },
+              children: availableQuestionPages,
             ),
     );
   }
