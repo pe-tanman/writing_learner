@@ -6,6 +6,8 @@ import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
 
+import 'package:writing_learner/provider/question_provider2.dart';
+
 class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
   static const routeName = 'question-view';
@@ -80,12 +82,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
                   color: Colors.grey,
                   child: Center(
                       child: Column(
-                    children: [
-                      if (answered) ModifiedAnswerRichText(page: page),
-                      if (answered)
-                        Text(
-                            '正解語数 :${questionData.correctWordsCount.toString()}')
-                    ],
+                    children: [if (answered) ModifiedAnswerRichText(page: page), if (answered) Text('正解語数 :${questionData.correctWordsCount.toString()}')],
                   )),
                 ),
               ),
@@ -113,6 +110,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
             )
           : PageView(
               scrollDirection: Axis.horizontal,
+              onPageChanged: (int page) async {
               onPageChanged: (int page) async {
                 currentPage = page - 1;
                 await preloadNextPage(ref, currentPage + 1);
