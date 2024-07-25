@@ -1,7 +1,5 @@
 import 'package:writing_learner/utilities/generative_content.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'question_provider.g.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class QuestionData {
   final String question;
@@ -17,18 +15,12 @@ class QuestionData {
   });
 }
 
-@riverpod
-class QuestionNotifier extends _$QuestionNotifier {
-  @override
-  List<QuestionData> build() {
-    // 初期状態を返す
-    return [];
-  }
+class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
+  QuestionDataNotifier() : super([]);
 
   // 新しい質問を追加
   void addQuestion(String questionSentence) {
     QuestionData questionData = QuestionData(question: questionSentence, answer: '', correctWordsCount: 0, modified: '');
-    //TODO正しくstateが読み込めない。毎回[]を読み込んでしまう
     state = [...state, questionData];
     for (var data in state) {
       print(data.question);
@@ -89,3 +81,5 @@ class QuestionNotifier extends _$QuestionNotifier {
     return -1;
   }
 }
+
+final questionDataProvider = StateNotifierProvider<QuestionDataNotifier, List<QuestionData>>((ref) => QuestionDataNotifier());

@@ -6,6 +6,8 @@ import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
 
+import 'package:writing_learner/provider/question_provider2.dart';
+
 class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
   static const routeName = 'question-view';
@@ -31,9 +33,9 @@ class QuestionViewState extends ConsumerState<QuestionView> {
   }
 
   Future<void> preloadNextPage(WidgetRef ref, int nextPage) async {
-    String questionSentence = await GenerativeService()
-        .generateText('大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-    ref.read(questionNotifierProvider.notifier).addQuestion(questionSentence);
+    String questionSentence = await GenerativeService().generateText('大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
+    //ref.read(questionNotifierProvider.notifier).addQuestion(questionSentence);
+    ref.read(questionDataProvider.notifier).addQuestion(questionSentence);
     availableQuestionPages.add(questionPage(ref, nextPage));
   }
 
@@ -41,8 +43,10 @@ class QuestionViewState extends ConsumerState<QuestionView> {
   bool answered = false;
 
   Widget questionPage(WidgetRef ref, int page) {
-    final questionData = ref.watch(questionNotifierProvider)[page];
-    final notifier = ref.read(questionNotifierProvider.notifier);
+    //final questionData = ref.watch(questionNotifierProvider)[page];
+    //final notifier = ref.read(questionNotifierProvider.notifier);
+    final questionData = ref.watch(questionDataProvider)[page];
+    final notifier = ref.read(questionDataProvider.notifier);
     return Scaffold(
       body: Center(
         child: Padding(
@@ -80,12 +84,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
                   color: Colors.grey,
                   child: Center(
                       child: Column(
-                    children: [
-                      if (answered) ModifiedAnswerRichText(page: page),
-                      if (answered)
-                        Text(
-                            '正解語数 :${questionData.correctWordsCount.toString()}')
-                    ],
+                    children: [if (answered) ModifiedAnswerRichText(page: page), if (answered) Text('正解語数 :${questionData.correctWordsCount.toString()}')],
                   )),
                 ),
               ),
@@ -113,7 +112,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
             )
           : PageView(
               scrollDirection: Axis.horizontal,
-              onPageChanged: (int page) async{
+              onPageChanged: (int page) async {
                 currentPage = page - 1;
                 await preloadNextPage(ref, currentPage + 1);
               },
