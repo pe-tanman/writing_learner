@@ -1,7 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class QuestionData {
   final String question;
@@ -16,26 +14,13 @@ class QuestionData {
     required this.modified,
   });
 }
-@riverpod
+
 class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
-    QuestionDataNotifier() : super([]);
+  QuestionDataNotifier() : super([]);
 
   // 新しい質問を追加
-  void addQuestionSentence(String questionSentence) {
-    QuestionData questionData = QuestionData(
-        question: questionSentence,
-        answer: '',
-        correctWordsCount: 0,
-        modified: '');
-    //TODO正しくstateが読み込めない。毎回[]を読み込んでしまう
-    state = [...state, questionData];
-    for (var data in state) {
-      print(data.question);
-    }
-  }
-
-  void addQuestionData(QuestionData questionData) {
-    //TODO正しくstateが読み込めない。毎回[]を読み込んでしまう
+  void addQuestion(String questionSentence) {
+    QuestionData questionData = QuestionData(question: questionSentence, answer: '', correctWordsCount: 0, modified: '');
     state = [...state, questionData];
     for (var data in state) {
       print(data.question);
@@ -50,25 +35,10 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
   // 特定のインデックスの質問の正解単語数を増やす
   Future<void> addAnswer(int page, String answerSentence) async {
     String questionSentence = state[page].question;
-    String modifiedSentence = await GenerativeService().generateText(
-        '以下の文章(1)は大学入試の英訳問題(2)の回答である。問題の回答として適切になるように文法と自然な言語使用の観点から修正を加えて。ただし入力が正しい場合は文章(1)を、間違っている場合は修正後の一文のみ答えること。： (1)$answerSentence (2)$questionSentence');
+    String modifiedSentence =
+        await GenerativeService().generateText('以下の文章(1)は大学入試の英訳問題(2)の回答である。問題の回答として適切になるように文法と自然な言語使用の観点から修正を加えて。ただし入力が正しい場合は文章(1)を、間違っている場合は修正後の一文のみ答えること。： (1)$answerSentence (2)$questionSentence');
     int correct = correctWordsCount(answerSentence, modifiedSentence);
-    state[page] = QuestionData(
-        question: questionSentence,
-        answer: answerSentence,
-        correctWordsCount: correct,
-        modified: modifiedSentence);
-  }
-
-  void addAnswerAndScore(int page, String answerSentence) async {
-    String questionSentence = state[page].question;
-    String modifiedSentence = state[page].modified;
-    int correct = correctWordsCount(answerSentence, modifiedSentence);
-    state[page] = QuestionData(
-        question: questionSentence,
-        answer: answerSentence,
-        correctWordsCount: correct,
-        modified: modifiedSentence);
+    state[page] = QuestionData(question: questionSentence, answer: answerSentence, correctWordsCount: correct, modified: modifiedSentence);
   }
 
   int correctWordsCount(var answerSentence, var modifiedSentence) {
@@ -111,5 +81,5 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     return -1;
   }
 }
-final questionDataProvider = StateNotifierProvider<QuestionDataNotifier, List<QuestionData>>((ref) => QuestionDataNotifier());
 
+final questionDataProvider = StateNotifierProvider<QuestionDataNotifier, List<QuestionData>>((ref) => QuestionDataNotifier());
