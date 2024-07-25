@@ -14,13 +14,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Writing learner',
-        theme: appTheme(),
-        home: const HomeScreen(),
-        routes: {
-          HomeScreen.routeName: (ctx) => const HomeScreen(),
-          QuestionView.routeName: (ctx) => const QuestionView(),
-        });
+    return MaterialApp(title: 'Writing learner', theme: appTheme(), home: const HomeScreen(), routes: {
+      HomeScreen.routeName: (ctx) => const HomeScreen(),
+      QuestionView.routeName: (ctx) => const QuestionView(),
+    });
   }
 }
