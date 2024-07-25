@@ -39,6 +39,14 @@ class QuestionNotifier extends _$QuestionNotifier {
     }
   }
 
+  void addQuestionData(QuestionData questionData) {
+    //TODO正しくstateが読み込めない。毎回[]を読み込んでしまう
+    state = [...state, questionData];
+    for (var data in state) {
+      print(data.question);
+    }
+  }
+
   // すべての質問をクリア
   void clearQuestions() {
     state = [];
@@ -49,6 +57,17 @@ class QuestionNotifier extends _$QuestionNotifier {
     String questionSentence = state[page].question;
     String modifiedSentence = await GenerativeService().generateText(
         '以下の文章(1)は大学入試の英訳問題(2)の回答である。問題の回答として適切になるように文法と自然な言語使用の観点から修正を加えて。ただし入力が正しい場合は文章(1)を、間違っている場合は修正後の一文のみ答えること。： (1)$answerSentence (2)$questionSentence');
+    int correct = correctWordsCount(answerSentence, modifiedSentence);
+    state[page] = QuestionData(
+        question: questionSentence,
+        answer: answerSentence,
+        correctWordsCount: correct,
+        modified: modifiedSentence);
+  }
+
+  void addAnswerAndScore(int page, String answerSentence) async {
+    String questionSentence = state[page].question;
+    String modifiedSentence = state[page].modified;
     int correct = correctWordsCount(answerSentence, modifiedSentence);
     state[page] = QuestionData(
         question: questionSentence,
