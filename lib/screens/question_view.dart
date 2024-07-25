@@ -34,15 +34,15 @@ class QuestionViewState extends ConsumerState<QuestionView> {
   Future<void> preloadNextPage(WidgetRef ref, int nextPage) async {
     String questionSentence = await GenerativeService()
         .generateText('大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-    ref.read(questionNotifierProvider.notifier).addQuestion(questionSentence);
+    ref.read(questionDataProvider.notifier).addQuestionSentence(questionSentence);
     availableQuestionPages.add(questionPage(ref, nextPage));
   }
 
   var answerSentence = '';
 
   Widget questionPage(WidgetRef ref, int page) {
-    final questionData = ref.watch(questionNotifierProvider)[page];
-    final notifier = ref.read(questionNotifierProvider.notifier);
+    final questionData = ref.watch(questionDataProvider)[page];
+    final notifier = ref.read(questionDataProvider.notifier);
     return Scaffold(
       body: Center(
         child: Padding(

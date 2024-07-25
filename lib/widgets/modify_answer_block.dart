@@ -69,7 +69,7 @@ class ModifiedAnswerRichText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final questionData = ref.watch(questionNotifierProvider)[page];
+    final questionData = ref.watch(questionDataProvider)[page];
     isLoading = questionData.modified == '';
     return isLoading
         ? const CircularProgressIndicator()

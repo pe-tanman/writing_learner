@@ -1,7 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'question_provider.g.dart';
 
 class QuestionData {
   final String question;
@@ -16,17 +16,12 @@ class QuestionData {
     required this.modified,
   });
 }
-
 @riverpod
-class QuestionNotifier extends _$QuestionNotifier {
-  @override
-  List<QuestionData> build() {
-    // 初期状態を返す
-    return [];
-  }
+class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
+    QuestionDataNotifier() : super([]);
 
   // 新しい質問を追加
-  void addQuestion(String questionSentence) {
+  void addQuestionSentence(String questionSentence) {
     QuestionData questionData = QuestionData(
         question: questionSentence,
         answer: '',
@@ -117,3 +112,5 @@ class QuestionNotifier extends _$QuestionNotifier {
     return -1;
   }
 }
+final questionDataProvider = StateNotifierProvider<QuestionDataNotifier, List<QuestionData>>((ref) => QuestionDataNotifier());
+
