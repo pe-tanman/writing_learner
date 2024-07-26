@@ -7,8 +7,6 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
-import 'package:writing_learner/widgets/modify_answer_block.dart';
-
 class ProverbQuestionView extends ConsumerStatefulWidget {
   const ProverbQuestionView({super.key});
   static const routeName = 'proverb-question-view';
@@ -51,20 +49,20 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
         question: questionSentence,
         answer: '',
         modified: modifiedSentence,
-        correctWordsCount: 0);
+        correctWordsCount: 0,
+        isAnswered: false);
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
     availableQuestionPages.add(ProverbQuestionPage(page:nextPage));
   }
 
   var answerSentence = '';
 
-
   @override
   Widget build(BuildContext context) {
-     answered = ref.watch(isAnsweredProvider);
-    if (isInit) {
+    if(isInit){
       initPages(ref);
     }
+
     return Scaffold(
       appBar: AppBar(
         actions: [],

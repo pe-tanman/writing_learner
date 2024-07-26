@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
 
@@ -18,10 +17,8 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
   @override
   Widget build(BuildContext context) {
     int currentPage = widget.page;
-    final answered = ref.read(isAnsweredProvider);
     final questionData = ref.watch(questionDataProvider)[currentPage];
     final notifier = ref.read(questionDataProvider.notifier);
-    print('reloaded');
     return Scaffold(
       body: Center(
         child: Padding(
@@ -37,7 +34,7 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
               TextField(
                 autocorrect: false,
                 maxLines: null,
-                enabled: !answered,
+                enabled: !questionData.isAnswered,
                 enableSuggestions: false,
                 decoration: const InputDecoration(hintText: "回答"),
                 onChanged: (value) {
@@ -50,8 +47,6 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
               ElevatedButton(
                   onPressed: () {
                     notifier.addAnswerAndScore(currentPage, answerSentence);
-                    ref.read(isAnsweredProvider.notifier).state = true;
-                    print('detect');
                   },
                   child: Text('答え合わせ')),
               Container(
@@ -59,7 +54,7 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
                 width: 500,
                 color: Colors.grey,
                 child: Center(
-                    child: ref.watch(isAnsweredProvider)
+                    child: questionData.isAnswered
                         ? Column(
                             children: [
                               ModifiedAnswerRichText(page: currentPage),

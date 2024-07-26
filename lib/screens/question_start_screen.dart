@@ -5,9 +5,10 @@ class QuestionStartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return const Scaffold(
         body: Column(
-          children: [Text('右スワイプで次の問題へ')],
-        ));
+      children: [Text('右スワイプで次の問題へ')],
+    ));
   }
 }
