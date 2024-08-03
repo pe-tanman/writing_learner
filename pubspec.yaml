@@ -37,8 +37,16 @@ dependencies:
   cupertino_icons: ^1.0.6
   google_generative_ai: ^0.4.3
   flutter_dotenv: ^5.1.0
+  flutter_riverpod: ^2.5.1
+  freezed_annotation: ^2.4.4
+  riverpod_annotation: ^2.3.5
+  csv: ^6.0.0
+  fast_csv: ^0.2.11
+  
 
 dev_dependencies:
+  
+
   flutter_test:
     sdk: flutter
 
@@ -48,6 +56,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  build_runner: ^2.4.11
+  riverpod_generator: ^2.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -62,6 +72,7 @@ flutter:
   assets:
     - .env
     - lib/assets/
+    - lib/assets/japanese_proverbs.csv
 
   # To add assets to your application, add an assets section, like this:
   # assets:
