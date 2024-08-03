@@ -72,28 +72,27 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     int i = 0, j = 0, wrong = 0;
-    while (i < words1.length || j < words2.length) {
+while (i < words1.length || j < words2.length) {
       if (i < words1.length && j < words2.length && words1[i] == words2[j]) {
         i++;
         j++;
       } else {
         // Find the next matching word
-        print('1');
         int nextMatch = _findNextMatch(words1, words2, i, j);
+
         if (nextMatch == -1) {
-          // No more matches, add all remaining words with underline
+
           while (j < words2.length) {
-            j++;
             wrong++;
+            j++;
           }
           break;
         } else {
-          // Add words up to the next match with underline
+
           while (j < nextMatch) {
+           wrong++;
             j++;
-            wrong++;
           }
-          print('2');
           i = words1.indexOf(words2[nextMatch], i);
         }
       }
