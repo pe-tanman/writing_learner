@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
+import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
-
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +15,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class HomeScreenState extends ConsumerState<HomeScreen> {
-  String levelStr = "難関国立";
   String questionSentence = '';
   var answerSentence = '';
   var modifiedSentence = '';
@@ -60,26 +59,34 @@ class HorizontalContents extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildItem('AI旧帝大', '和文英訳',
-                     'lib/assets/ai_image.jpeg', QuestionView.routeName, context, ref),
-                _buildItem('ことわざ', '表現',
-                    'lib/assets/ai_image.jpeg', ProverbQuestionView.routeName, context, ref),
-               _buildItem('構文150', '構文',
-                    'lib/assets/ai_image.jpeg', ProverbQuestionView.routeName, context, ref),
+                _buildItem('AI東大英訳', '和文英訳', 'lib/assets/ai_image.jpeg',
+                    QuestionView.routeName, context, ref, '東京'),
+                _buildItem('ことわざ', '表現', 'lib/assets/ai_image.jpeg',
+                    ProverbQuestionView.routeName, context, ref),
+                _buildItem('構文150', '構文', 'lib/assets/ai_image.jpeg',
+                    ProverbQuestionView.routeName, context, ref),
               ]),
         ],
       ),
     );
   }
 
-  Widget _buildItem(String title, String discription, var imagePath,var route, var context, WidgetRef ref) {
+  Widget _buildItem(String title, String discription, var imagePath, var route,
+      var context, WidgetRef ref, [String? levelStr]) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(route);
+            if(levelStr == null){
+              Navigator.of(context).pushNamed(route);
+            }
+            else{
+              Navigator.of(context).pushNamed(route, arguments: levelStr);
+            }
+            
             ref.read(questionDataProvider.notifier).clearQuestions();
+            ref.read(isAnsweredProvider.notifier).state = true;
           },
           child: Container(
             decoration: BoxDecoration(

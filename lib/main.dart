@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         home: const HomeScreen(),
         routes: {
           HomeScreen.routeName: (ctx) => const HomeScreen(),
-          QuestionView.routeName: (ctx) => const QuestionView(),
+          QuestionView.routeName: (ctx) =>  const QuestionView(),
           ProverbQuestionView.routeName: (ctx) => const ProverbQuestionView(),
         });
   }
