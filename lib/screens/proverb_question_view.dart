@@ -7,6 +7,8 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:fast_csv/fast_csv.dart' as fast_csv;
+
 class ProverbQuestionView extends ConsumerStatefulWidget {
   const ProverbQuestionView({super.key});
   static const routeName = 'proverb-question-view';
@@ -20,6 +22,8 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
   var isLoading = true;
   var answered = false;
   int currentPage = 0;
+  int questionNum = -1;
+  late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
 
@@ -27,61 +31,104 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
   Future<List<List<String>>> loadCSVFromAssets() async {
     String assetPath = 'lib/assets/japanese_proverbs.csv';
     final String csvString = await rootBundle.loadString(assetPath);
-    List<List<String>> csvData =
-        csvString.split('\n').map((line) => line.split(',')).toList();
+    List<List<String>> csvData = fast_csv.parse(csvString);
     return csvData;
   }
 
   Future<void> initPages(WidgetRef ref) async {
     availableQuestionPages.add(const QuestionStartScreen());
     await preloadNextPage(ref, 0);
+    ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;
     setState(() {
       isLoading = false;
     });
   }
 
-  Future<void> preloadNextPage(WidgetRef ref, int nextPage) async {
+  Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
     var csvData = await loadCSVFromAssets();
-    String questionSentence = csvData[nextPage][0];
-    String modifiedSentence = csvData[nextPage][1];
+    String questionSentence = csvData[nextQuestion][0];
+    String modifiedSentence = csvData[nextQuestion][1];
     QuestionData questionData = QuestionData(
         question: questionSentence,
         answer: '',
         modified: modifiedSentence,
-        correctWordsCount: 0,
-        isAnswered: false);
+        wrongWordsCount: 0);
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
-    availableQuestionPages.add(ProverbQuestionPage(page:nextPage));
+    availableQuestionPages.add(ProverbQuestionPage(questionNum: nextQuestion));
   }
 
   var answerSentence = '';
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if(isInit){
+    if (isInit) {
       initPages(ref);
     }
 
     return Scaffold(
-      appBar: AppBar(
-        actions: [],
-      ),
-      body: isLoading
-          ? const Center(
-              child: Column(
-                children: [CircularProgressIndicator(), Text('あなたに最適な問題を作成中')],
-              ),
-            )
-          : PageView(
-              scrollDirection: Axis.horizontal,
-              onPageChanged: (int page) async {
-                currentPage = page - 1;
-                await preloadNextPage(ref, currentPage + 1);
-                ref.read(isAnsweredProvider.notifier).state = false;
-              },
-              children: availableQuestionPages,
-            ),
-    );
+        appBar: AppBar(
+          actions: [],
+        ),
+        body: isLoading
+            ? const Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    Text('あなたに最適な問題を作成中')
+                  ],
+                ),
+              )
+            : NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification notification) {
+                  if (notification is ScrollUpdateNotification &&
+                      notification.metrics is PageMetrics) {
+                    PageMetrics metrics = notification.metrics as PageMetrics;
+                    int nextPage = metrics.page!.round();
+                    if (nextPage > currentPage &&
+                        ref.watch(isAnsweredProvider)) {
+                    } else if (metrics.page! < currentPage.toDouble()) {
+                      _pageController.jumpToPage(currentPage);
+                      print('back');
+                      return true;
+                    } else if (metrics.page! > currentPage.toDouble() &&
+                        !ref.watch(isAnsweredProvider)) {
+                      _pageController.jumpToPage(currentPage);
+                      print('prohibited');
+                      return true;
+                    }
+                  }
+                  return false;
+                },
+                child: PageView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _pageController,
+                  onPageChanged: (int page) async {
+                    if (page % 6 != 0) {
+                      questionNum++;
+                    }
+
+                    if ((page + 1) % 6 == 0) {
+                      availableQuestionPages.add(const QuestionStartScreen());
+                    } else {
+                      await preloadNextPage(ref, questionNum + 1);
+                    }
+
+                    if ((page) % 6 == 0) {
+                      ref.read(isAnsweredProvider.notifier).state = true;
+                    } else {
+                      ref.read(isAnsweredProvider.notifier).state = false;
+                    }
+
+                    currentPage = page;
+                  },
+                  children: availableQuestionPages,
+                ),
+              ));
   }
 }

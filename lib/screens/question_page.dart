@@ -4,17 +4,17 @@ import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
 
-class ProverbQuestionPage extends ConsumerStatefulWidget {
-  const ProverbQuestionPage({super.key, required this.questionNum});
+class QuestionPage extends ConsumerStatefulWidget {
+  const QuestionPage({super.key, required this.questionNum});
   final int questionNum;
 
   @override
-  ConsumerState<ProverbQuestionPage> createState() =>
-      ProverbQuestionPageState();
+  ConsumerState<QuestionPage> createState() => QuestionPageState();
 }
 
-class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
+class QuestionPageState extends ConsumerState<QuestionPage> {
   String answerSentence = '';
+  bool showAnswer = false;
   @override
   Widget build(BuildContext context) {
     int questionNum = widget.questionNum;
@@ -22,15 +22,12 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
 
     final notifier = ref.read(questionDataProvider.notifier);
     return Scaffold(
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(
-                height: 30,
-              ),
               Text('問題文:\n${questionData.question}'),
               const SizedBox(height: 15),
               TextField(
@@ -47,9 +44,17 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
                 height: 15,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    notifier.addAnswerAndScore(questionNum, answerSentence);
+                  onPressed: () async{
+                    if(ref.read(isAnsweredProvider)){
+                      return;
+                    }
+                    setState(() {
+                      showAnswer = true;
+                    });
+                    
+                    await notifier.addAnswer(questionNum, answerSentence);
                     ref.read(isAnsweredProvider.notifier).state = true;
+                    
                   },
                   child: Text('答え合わせ')),
               Container(
@@ -57,7 +62,7 @@ class ProverbQuestionPageState extends ConsumerState<ProverbQuestionPage> {
                 width: 500,
                 color: Colors.grey,
                 child: Center(
-                    child: ref.watch(isAnsweredProvider)
+                    child: showAnswer
                         ? Column(
                             children: [
                               ModifiedAnswerRichText(page: questionNum),
