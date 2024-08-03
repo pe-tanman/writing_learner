@@ -114,7 +114,7 @@ class ModifiedAnswerRichTextState
         // Find the next matching word
         int nextMatch = _findNextMatch(words1, words2, i, j);
 
-        if (nextMatch == -1) {
+        if (nextMatch == -1 || words1.indexOf(words2[nextMatch], i) == -1) {
           // No more matches, add all remaining words with underline
           GrammarError error = GrammarError(
               start: j,
