@@ -135,6 +135,7 @@ class ModifiedAnswerRichTextState
             ));
             j++;
           }
+
           break;
         } else {
           // Add words up to the next match with underline
@@ -190,7 +191,9 @@ class ModifiedAnswerRichTextState
   @override
   Widget build(BuildContext context) {
     var questionData = ref.watch(questionDataProvider)[page];
-    isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+    setState(() {
+      isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+    });
     return isLoading
         ? const CircularProgressIndicator()
         : RichText(

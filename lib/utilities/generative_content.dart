@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:translator/translator.dart';
 
 final strProvider = Provider((ref) {
   return 'Hello Riverpod';
@@ -40,6 +41,13 @@ class GenerativeService {
       }
     }
     return output;
+  }
+
+  Future<String> translate(String input) async {
+    var translator = GoogleTranslator();
+    var translation =
+        await translator.translate(input, from: 'ja', to: 'en');
+    return translation.text;
   }
 
   Future<void> makeRequest() async {
