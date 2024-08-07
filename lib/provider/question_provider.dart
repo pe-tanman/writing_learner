@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,12 +8,16 @@ class QuestionData {
   final String answer;
   final String modified;
   final int wrongWordsCount;
+  final String? fillingQuestion;
+  final List<String>? fillingAnswers;
 
   QuestionData({
     required this.question,
     required this.answer,
     required this.wrongWordsCount,
     required this.modified,
+     this.fillingQuestion,
+     this.fillingAnswers,
   });
 }
 
@@ -30,6 +35,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     );
     state = [...state, questionData];
   }
+  
 
   void addQuestionData(QuestionData questionData) {
     state = [...state, questionData];
@@ -72,7 +78,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     int i = 0, j = 0, wrong = 0;
-while (i < words1.length || j < words2.length) {
+    while (i < words1.length || j < words2.length) {
       if (i < words1.length && j < words2.length && words1[i] == words2[j]) {
         i++;
         j++;
@@ -81,16 +87,14 @@ while (i < words1.length || j < words2.length) {
         int nextMatch = _findNextMatch(words1, words2, i, j);
 
         if (nextMatch == -1) {
-
           while (j < words2.length) {
             wrong++;
             j++;
           }
           break;
         } else {
-
           while (j < nextMatch) {
-           wrong++;
+            wrong++;
             j++;
           }
           i = words1.indexOf(words2[nextMatch], i);
