@@ -110,6 +110,9 @@ class FillingQuestionPageState extends ConsumerState<FillingQuestionPage> {
               ),
               ElevatedButton(
                   onPressed: () async {
+                    if (ref.read(isAnsweredProvider)) {
+                      return;
+                    }
                     if (convertToAnswerSentence() == null) {
                       return;
                     }
@@ -122,7 +125,7 @@ setState(() {
                           showAnswer = true;
                         });
 
-print(convertToAnswerSentence());
+print('sentence${convertToAnswerSentence()}');
                         await notifier.addAnswer(questionNum, convertToAnswerSentence()!);
                         ref.read(isAnsweredProvider.notifier).state = true;
                       }
