@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/screens/filling_question_page.dart';
+import 'package:writing_learner/screens/question_result_screen.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
@@ -118,7 +119,7 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionStartScreen());
+                      availableQuestionPages.add(const QuestionResultScreen());
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

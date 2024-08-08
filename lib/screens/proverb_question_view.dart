@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/screens/proverb_question_page.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
+import 'package:writing_learner/screens/question_result_screen.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -114,7 +115,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionStartScreen());
+                      availableQuestionPages.add(const QuestionResultScreen());
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }
