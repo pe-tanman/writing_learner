@@ -179,13 +179,26 @@ class ModifiedAnswerRichTextState
 
     String reason = await GenerativeService().generateText(
         '英訳問題(0): $questionSentence, 英訳回答(1): $answerSentence, 回答の修正(2): $modifiedSentence (1)の回答は(2)のように修正された[(1)→(2)]。修正の理由をそれぞれ教えて。ただし簡潔な修正の理由のリスト（カンマ区切り、日本語）のみ出力すること。: $modificationSetsString');
-    print('reason$reason');
-    print(_errors);
-    List reasons = reason.split(', ');
 
-    for (int i = 0; i < _errors.length; i++) {
-      _errors[i].reason = reasons[i];
+    List reasons = [];
+    if (reason.contains(', ')) {
+      reasons = reason.split(', ');
+    } else {
+      reasons.add(reason);
     }
+    for (int i = 0; i < _errors.length; i++) {
+      _errors[i].reason = reasons[i];//TODO:AIの修正理由のフォーマットが正しくない場合があるので修正が必要
+    }
+  }
+
+  Future<void> laterReadQuestionData() async {
+    Future.delayed(Duration(seconds: 2), () {
+      var modifiedSentence = ref.watch(questionDataProvider)[page].modified;
+      setState(() {
+        isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+      });
+      print(ref.watch(questionDataProvider));
+    });
   }
 
   @override
@@ -194,6 +207,7 @@ class ModifiedAnswerRichTextState
     setState(() {
       isLoading = (ref.watch(questionDataProvider)[page].modified == '');
     });
+    laterReadQuestionData();
     return isLoading
         ? const CircularProgressIndicator()
         : RichText(
