@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
@@ -61,6 +62,8 @@ class HorizontalContents extends ConsumerWidget {
               children: [
                 _buildItem('AI東大英訳', '和文英訳', 'lib/assets/ai_image.jpeg',
                     QuestionView.routeName, context, ref, '東京'),
+                    _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/ai_image.jpeg',
+                    FillingQuestionView.routeName, context, ref, '東京'),
                 _buildItem('ことわざ', '表現', 'lib/assets/ai_image.jpeg',
                     ProverbQuestionView.routeName, context, ref),
                 _buildItem('構文150', '構文', 'lib/assets/ai_image.jpeg',
