@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
@@ -193,11 +194,13 @@ class ModifiedAnswerRichTextState
 
   Future<void> laterReadQuestionData() async {
     Future.delayed(Duration(seconds: 2), () {
-      var modifiedSentence = ref.watch(questionDataProvider)[page].modified;
+      if(ref.read(isAnsweredProvider)){
+        var modifiedSentence = ref.watch(questionDataProvider)[page].modified;
       setState(() {
         isLoading = (ref.watch(questionDataProvider)[page].modified == '');
       });
-      print(ref.watch(questionDataProvider));
+      }
+      
     });
   }
 
