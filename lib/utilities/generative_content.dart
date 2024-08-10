@@ -11,12 +11,12 @@ final strProvider = Provider((ref) {
 });
 
 class GenerativeService {
-  Future<String> invokeAPI(String prompt, bool json) async {
+  Future<String> invokeAPI(String prompt, bool json, var temperature) async {
     await dotenv.load(fileName: '.env');
     String apiKey = dotenv.get('GEMINI_API_KEY');
     if (json) {}
     GenerationConfig config = GenerationConfig(
-        temperature: 0.0,
+        temperature: temperature,
         topP: 1.0,
         responseMimeType: json ? 'application/json' : 'text/plain',
         stopSequences: ['\n']);
@@ -39,7 +39,7 @@ class GenerativeService {
     while (retryCount < maxRetries && !success) {
       try {
         // Replace with your actual request logic
-        output = await invokeAPI(prompt, false);
+        output = await invokeAPI(prompt, false, 1.0);
         success = true;
       } catch (e) {
         retryCount++;
@@ -89,7 +89,7 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
     while (retryCount < maxRetries && !success) {
       try {
         // call json api
-        output = await invokeAPI(prompt, true);
+        output = await invokeAPI(prompt, true, 0.0);
 
         reasonMaps =
             jsonDecode(output).cast<Map<String, dynamic>>();
