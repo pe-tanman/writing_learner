@@ -56,19 +56,21 @@ class HorizontalContents extends ConsumerWidget {
               ],
             ),
           ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+             SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
                 _buildItem('AI東大英訳', '和文英訳', 'lib/assets/ai_image.jpeg',
-                    QuestionView.routeName, context, ref, '東京'),
-                    _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/ai_image.jpeg',
-                    FillingQuestionView.routeName, context, ref, '東京'),
+                  QuestionView.routeName, context, ref, '東京'),
+                _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/ai_image.jpeg',
+                  FillingQuestionView.routeName, context, ref, '東京'),
                 _buildItem('ことわざ', '表現', 'lib/assets/ai_image.jpeg',
-                    ProverbQuestionView.routeName, context, ref),
+                  ProverbQuestionView.routeName, context, ref),
                 _buildItem('構文150', '構文', 'lib/assets/ai_image.jpeg',
-                    ProverbQuestionView.routeName, context, ref),
-              ]),
+                  ProverbQuestionView.routeName, context, ref),
+                ],
+              ),
+              ),
         ],
       ),
     );
@@ -76,7 +78,9 @@ class HorizontalContents extends ConsumerWidget {
 
   Widget _buildItem(String title, String discription, var imagePath, var route,
       var context, WidgetRef ref, [String? levelStr]) {
-    return Expanded(
+    return SizedBox(
+      width: 150,
+      height: 200,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: InkWell(

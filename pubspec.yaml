@@ -44,6 +44,8 @@ dependencies:
   fast_csv: ^0.2.11
   google_translate: ^0.0.6
   translator: ^1.0.0
+  langchain: ^0.0.3
+  langchain_google: ^0.0.1-dev.1
   
 
 dev_dependencies:
