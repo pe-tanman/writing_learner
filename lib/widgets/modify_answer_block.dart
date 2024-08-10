@@ -172,35 +172,23 @@ class ModifiedAnswerRichTextState
     String questionSentence = ref.watch(questionDataProvider)[page].question;
     String answerSentence = ref.watch(questionDataProvider)[page].answer;
     String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
-    String modificationSetsString = '';
-    for (GrammarError error in _errors) {
-      modificationSetsString =
-          '$modificationSetsString${error.oritinalStr}→${error.suggestedStr}, ';
-    }
 
-    String reason = await GenerativeService().generateText(
-        '英訳問題(0): $questionSentence, 英訳回答(1): $answerSentence, 回答の修正(2): $modifiedSentence (1)の回答は(2)のように修正された[(1)→(2)]。修正の理由をそれぞれ教えて。ただし簡潔な修正の理由のリスト（カンマ区切り、日本語）のみ出力すること。: $modificationSetsString');
-
-    List reasons = [];
-    if (reason.contains(', ')) {
-      reasons = reason.split(', ');
-    } else {
-      reasons.add(reason);
-    }
+    var reasons = await GenerativeService()
+        .generateReasonMaps(_errors, questionSentence, answerSentence, modifiedSentence);
     for (int i = 0; i < _errors.length; i++) {
-      _errors[i].reason = reasons[i];//TODO:AIの修正理由のフォーマットが正しくない場合があるので修正が必要
+      _errors[i].reason = reasons[i]['reason'];
     }
   }
 
   Future<void> laterReadQuestionData() async {
     Future.delayed(Duration(seconds: 2), () {
-      if(ref.read(isAnsweredProvider)){
-        var modifiedSentence = ref.watch(questionDataProvider)[page].modified;
-      setState(() {
-        isLoading = (ref.watch(questionDataProvider)[page].modified == '');
-      });
+      var isAnswered = ref.watch(isAnsweredProvider);
+      if (isAnswered) {
+        setState(() {
+          isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+        });
+        print(ref.watch(questionDataProvider));
       }
-      
     });
   }
 
@@ -210,7 +198,9 @@ class ModifiedAnswerRichTextState
     setState(() {
       isLoading = (ref.watch(questionDataProvider)[page].modified == '');
     });
-    laterReadQuestionData();
+    if (isLoading) {
+      laterReadQuestionData();
+    }
     return isLoading
         ? const CircularProgressIndicator()
         : RichText(
@@ -222,20 +212,3 @@ class ModifiedAnswerRichTextState
   }
 }
 
-class GrammarError {
-  final int start;
-  final int end;
-  final List<String> original;
-  final List<String> suggestion;
-  String oritinalStr;
-  String suggestedStr;
-  String reason = '';
-
-  GrammarError(
-      {required this.start,
-      required this.end,
-      required this.original,
-      required this.suggestion})
-      : oritinalStr = original.join(' '),
-        suggestedStr = suggestion.join(' ');
-}
