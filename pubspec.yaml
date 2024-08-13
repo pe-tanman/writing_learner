@@ -46,6 +46,7 @@ dependencies:
   translator: ^1.0.0
   langchain: ^0.0.3
   langchain_google: ^0.0.1-dev.1
+  google_fonts: ^6.2.1
   
 
 dev_dependencies:
@@ -78,6 +79,14 @@ flutter:
     - lib/assets/
     - lib/assets/japanese_proverbs.csv
     - lib/assets/pattern_data.json
+  fonts:
+    - family: NotoSansJP
+      fonts:
+        - asset: lib/assets/fonts/NotoSansJP-VariableFont_wght.ttf
+          weight: 500
+    - family: hiragino
+      fonts:
+        - asset: lib/assets/fonts/hiragino.ttc
 
   # To add assets to your application, add an assets section, like this:
   # assets:

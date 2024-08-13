@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:writing_learner/themes/app_color.dart';
 
 class QuestionResultScreen extends ConsumerStatefulWidget {
   const QuestionResultScreen({super.key});
@@ -40,31 +41,36 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
     return Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(children: [
-                const Text('右スワイプで次の問題へ'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+                children: [
+          Image.asset('lib/assets/l01_rectangle.png'),
+            
                 const SizedBox(height: 20),
                 Table(
-          border: TableBorder.all(),
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            TableRow(
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-          ),
-          children: [const TableCell(child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Center(child: Text('#')),
-          ))] + numTableRow,
-            ),
-            TableRow(
-          children: [const TableCell(child:Padding(
-            padding: EdgeInsets.all(8),
-            child: 
-              Center(child: Text('間違い')),
-            
-          ))] + countTableRow,
-            ),
-          ],
+                  border: const TableBorder(verticalInside: const BorderSide( width: 0.7),),
+
+                          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                          children: [
+                             TableRow(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: AppColors.themeColor.withAlpha(100),
+                          ),
+                          children: [const TableCell(child:  Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(child: Text('#')),
+                          ))] + numTableRow,
+                            ),
+                            TableRow(
+                          children: [const TableCell(child:Padding(
+                            padding: EdgeInsets.all(8),
+                            child: 
+                              Center(child: Text('間違い')),
+                            
+                          ))] + countTableRow,
+                            ),
+                          ],
                 )
               ]),
         ));

@@ -28,7 +28,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('問題文:\n${questionData.question}'),
+              Text(questionData.question),
               const SizedBox(height: 15),
               TextField(
                 autocorrect: false,
@@ -57,21 +57,16 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                     
                   },
                   child: Text('答え合わせ')),
-              Container(
-                height: 200,
-                width: 500,
-                color: Colors.grey,
-                child: Center(
-                    child: showAnswer
-                        ? Column(
-                            children: [
-                              ModifiedAnswerRichText(page: questionNum),
-                              Text(
-                                  '間違い :${questionData.wrongWordsCount.toString()}')
-                            ],
-                          )
-                        : Container()),
-              ),
+              Center(
+                  child: showAnswer
+                      ? Column(
+                          children: [
+                            ModifiedAnswerRichText(page: questionNum),
+                            Text(
+                                '間違い :${questionData.wrongWordsCount.toString()}')
+                          ],
+                        )
+                      : Container()),
             ],
           ),
         ),

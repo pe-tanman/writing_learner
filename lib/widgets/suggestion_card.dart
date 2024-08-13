@@ -22,12 +22,8 @@ class SuggestionCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Suggestion: $suggestion'),
-            Text('Reason: $reason'),
-            TextButton(
-              onPressed: onApply,
-              child: const Text('Apply'),
-            ),
+            (reason.isEmpty)?
+            const CircularProgressIndicator():Text(reason),
           ],
         ),
       ),

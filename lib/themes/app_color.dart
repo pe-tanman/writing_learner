@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static final themeColor = Colors.lime.shade700;
-  static final themeColorPrimary = Colors.lime;
-  static const accentColor = Colors.limeAccent;
+  static final themeColor = Colors.blue.shade900;
+  static const themeColorPrimary = Colors.orange;
+  static get accentTextColor => Colors.orange.shade700;
+  static get accentColor => Colors.orangeAccent;
   static const scaffoldBackgroundColor = Colors.white;
   //text color
   static const darkText1 = Colors.black;

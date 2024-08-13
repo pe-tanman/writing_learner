@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'dart:math';
 
+import 'package:writing_learner/widgets/loading_indicator.dart';
+
 class FillingPatternQuestionView extends ConsumerStatefulWidget {
   const FillingPatternQuestionView({super.key});
   static const routeName = 'filling-pattern-question-view';
@@ -43,20 +45,17 @@ class FillingPatternQuestionViewState
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
     String levelStr = ModalRoute.of(context)!.settings.arguments as String;
 
-    final patternData = extractPatternData();
-    String questionSentence = await GenerativeService().generateText(
-        '$patternDataを使って$levelStr大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-    String fillQuestionSentence = await GenerativeService().generateText(
-        "以下の文章を英訳して、英語学習上重要な$patternDataに対応する部分と他のいくつかの文構造や単語の部分を___を用いて穴埋め形式にして。ただし穴埋め形式の文のみ出力しなさい。：$questionSentence");
+    final patternData = await extractPatternData();
 
-
+    Map fillQuestion =
+        await GenerativeService().generateFillingPatternQuestion(patternData);
+print(fillQuestion);
     ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
-        question: questionSentence,
+        question: fillQuestion['Japanese Sentence'],
         answer: '',
         wrongWordsCount: 0,
-        modified: '',
-        fillingQuestion: fillQuestionSentence));
-    print(questionNum);
+        modified: fillQuestion['English Sentence'],
+        fillingQuestion: fillQuestion['Filling Question'],));
     availableQuestionPages.add(FillingQuestionPage(questionNum: nextQuestion));
   }
 
@@ -76,7 +75,7 @@ class FillingPatternQuestionViewState
       // Randomly select one pattern from patternData
       final random = Random();
       final selectedPattern = patternData[random.nextInt(patternData.length)];
-
+      print(selectedPattern);
       return selectedPattern;
     } catch (e) {
       print('Error: $e');
@@ -95,7 +94,6 @@ class FillingPatternQuestionViewState
   Widget build(BuildContext context) {
     if (isInit) {
       initPages(ref);
-      
     }
 
     return Scaffold(
@@ -103,14 +101,7 @@ class FillingPatternQuestionViewState
           actions: [],
         ),
         body: isLoading
-            ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('あなたに最適な問題を作成中')
-                  ],
-                ),
-              )
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&

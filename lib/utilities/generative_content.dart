@@ -54,7 +54,37 @@ class GenerativeService {
     return output;
   }
 
-  Future<List<Map<String, dynamic>>> generateReasonMaps(
+  Future <Map<String, dynamic>>  generateFillingQuestion() async{
+    var scheme = """
+{Japanese Sentence: "", English Sentence: "", Filling Question: ""}
+    """;
+    var prompt = """
+    Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same translation with a blank space ___ in important expressions for English learners. The sentence should be a random output of a sentence that can be used for university entrance exams. Output Japanse sentence, its English translation, and the same translation with a blank space ___ in important expressions for English learners.
+  Using this JSON schema:
+    Map<String, dynamic> scheme = ${scheme.toString()}
+  Return scheme
+  """;
+    var output = await invokeAPI(prompt, true, 0.0);
+    return convert.jsonDecode(output);
+  }
+
+  Future <Map<String, dynamic>>  generateFillingPatternQuestion(var patternData) async{
+    var scheme = """
+{Japanese Sentence: "", English Sentence: "", Filling Question: ""}
+    """;
+    var prompt = """
+  Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same translation with a blank space ___ each word in important expressions for English learners. The sentence should be a random output of a sentence that can be used for university entrance exams. 
+  Note: Use expression: $patternData
+  Using this JSON schema:
+    Map<String, dynamic> scheme = ${scheme.toString()}
+  Return scheme
+  """;
+var output = await invokeAPI(prompt, true, 0.0);
+Map<String, dynamic> result = convert.jsonDecode(output);
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> generateReasonMaps (
       List<GrammarError> errors,
       String questionSentence,
       String answeredSentence,
@@ -68,8 +98,8 @@ class GenerativeService {
 
     for (var error in errors) {
       scheme.add({
-        'original:': error.original,
-        'suggestion': error.suggestion,
+        'original:': error.oritinalStr,
+        'suggestion': error.suggestedStr,
         'reason': 'reason'
       });
     }
