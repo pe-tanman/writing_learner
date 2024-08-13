@@ -33,7 +33,7 @@ class FillingQuestionPageState extends ConsumerState<FillingQuestionPage> {
                 width: 80,
                 child: TextField(
                     controller: _controllers[i],
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       isDense: true,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -131,7 +131,7 @@ setState(() {
                       }
                     } 
                   },
-                  child: Text('答え合わせ')),
+                  child: const Text('答え合わせ')),
               Center(
                   child: showAnswer
                       ? Column(
