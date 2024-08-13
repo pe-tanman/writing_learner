@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
+import 'package:writing_learner/themes/app_theme.dart';
+import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
@@ -65,14 +67,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
           actions: [],
         ),
         body: isLoading
-            ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('あなたに最適な問題を作成中')
-                  ],
-                ),
-              )
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&

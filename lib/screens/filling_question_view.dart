@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
+import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class FillingQuestionView extends ConsumerStatefulWidget {
   const FillingQuestionView({super.key});
@@ -37,29 +38,16 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
   }
 
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
-    String levelStr = ModalRoute.of(context)!.settings.arguments as String;
-    String questionSentence = await GenerativeService().generateText(
-        '$levelStr大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-    String fillQuestionSentence = await GenerativeService().generateText(
-        "以下の文章を英訳して、英語学習上重要ないくつかの文構造や単語の部分を___を用いて穴埋め形式にして。ただし穴埋め形式の文のみ出力しなさい。：$questionSentence");
-    var formIndexs = [];
-    /*
-    var words = fillQuestionSentence.split(' ');
-    
-    for (var i = 0; i < words.length; i++) {
-      if (words[i] == '___') {
-        formIndexs.add(i);
-      }
-    }
-    */
+       Map fillQuestion =
+        await GenerativeService().generateFillingQuestion();
 
     ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
-        question: questionSentence,
-        answer: '',
-        wrongWordsCount: 0,
-        modified: '',
-        fillingQuestion: fillQuestionSentence));
-    print(questionNum);
+          question: fillQuestion['Japanese Sentence'],
+          answer: '',
+          wrongWordsCount: 0,
+          modified: fillQuestion['English Sentence'],
+          fillingQuestion: fillQuestion['Filling Question'],
+        ));
     availableQuestionPages.add(FillingQuestionPage(questionNum: nextQuestion));
   }
 
@@ -81,14 +69,7 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
           actions: [],
         ),
         body: isLoading
-            ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('あなたに最適な問題を作成中')
-                  ],
-                ),
-              )
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&

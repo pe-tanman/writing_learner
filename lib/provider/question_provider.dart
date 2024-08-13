@@ -16,8 +16,8 @@ class QuestionData {
     required this.answer,
     required this.wrongWordsCount,
     required this.modified,
-     this.fillingQuestion,
-     this.fillingAnswers,
+    this.fillingQuestion,
+    this.fillingAnswers,
   });
 }
 
@@ -35,7 +35,6 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     );
     state = [...state, questionData];
   }
-  
 
   void addQuestionData(QuestionData questionData) {
     state = [...state, questionData];
@@ -64,12 +63,14 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
   void addAnswerAndScore(int page, String answerSentence) async {
     String questionSentence = state[page].question;
     String modifiedSentence = state[page].modified;
+    String? fillingQuestion = state[page].fillingQuestion;
     int wrong = wrongWordsCount(answerSentence, modifiedSentence);
     state[page] = QuestionData(
       question: questionSentence,
       answer: answerSentence,
       wrongWordsCount: wrong,
       modified: modifiedSentence,
+      fillingQuestion: fillingQuestion
     );
     //isAnsweredが変化してもbuild treeで反応しない→反応させる方法はあるか、別の方法（isAnsweredProviderをリストにする）or currentPageみたいなのをつけることでそこまでは一括で回答済みにする＋isAnsweredProvider戻れる必要性がない
   }

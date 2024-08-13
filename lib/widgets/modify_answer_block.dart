@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:flutter/gestures.dart';
+import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/widgets/suggestion_card.dart';
 
@@ -20,7 +23,7 @@ class ModifiedAnswerRichTextState
   ModifiedAnswerRichTextState(this.page);
 
   final int page;
-  List<GrammarError> _errors = <GrammarError>[];
+  final List<GrammarError> _errors = [];
   bool isLoading = true;
   String answeredSentence = '';
   OverlayEntry? _overlayEntry;
@@ -94,7 +97,8 @@ class ModifiedAnswerRichTextState
     return -1;
   }
 
-  List<InlineSpan> spans(String answerSentence, String modifiedSentence) {
+  List<InlineSpan> spans(
+      String answerSentence, String modifiedSentence, bool suggestionReason) {
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     List<InlineSpan> spans = [];
@@ -127,12 +131,17 @@ class ModifiedAnswerRichTextState
           while (j < words2.length) {
             spans.add(TextSpan(
               text: '${words2[j]} ',
-              style: const TextStyle(
-                  fontSize: 15, decoration: TextDecoration.underline),
+              style: TextStyle(
+                  color: AppColors.accentTextColor,
+                  fontSize: 15,
+                  decoration:
+                      suggestionReason ? TextDecoration.underline : null),
               recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  _showSuggestionCard(error);
-                },
+                ..onTap = suggestionReason
+                    ? () {
+                        _showSuggestionCard(error);
+                      }
+                    : null,
             ));
             j++;
           }
@@ -151,12 +160,17 @@ class ModifiedAnswerRichTextState
           while (j < nextMatch) {
             spans.add(TextSpan(
               text: '${words2[j]} ',
-              style: const TextStyle(
-                  fontSize: 15, decoration: TextDecoration.underline),
+              style: TextStyle(
+                  color: AppColors.accentTextColor,
+                  fontSize: 15,
+                  decoration:
+                      suggestionReason ? TextDecoration.underline : null),
               recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  _showSuggestionCard(error);
-                },
+                ..onTap = suggestionReason
+                    ? () {
+                        _showSuggestionCard(error);
+                      }
+                    : null,
             ));
             j++;
           }
@@ -164,7 +178,10 @@ class ModifiedAnswerRichTextState
         }
       }
     }
-    getReason();
+    if (ref.read(questionDataProvider)[page].wrongWordsCount > 0) {
+      getReason();
+    }
+
     return spans;
   }
 
@@ -173,9 +190,10 @@ class ModifiedAnswerRichTextState
     String answerSentence = ref.watch(questionDataProvider)[page].answer;
     String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
 
-    var reasons = await GenerativeService()
-        .generateReasonMaps(_errors, questionSentence, answerSentence, modifiedSentence);
-    for (int i = 0; i < _errors.length; i++) {
+    var reasons = await GenerativeService().generateReasonMaps(
+        _errors, questionSentence, answerSentence, modifiedSentence);
+    print(reasons);
+    for (int i = 0; i <=reasons.length-1; i++) {
       _errors[i].reason = reasons[i]['reason'];
     }
   }
@@ -203,12 +221,28 @@ class ModifiedAnswerRichTextState
     }
     return isLoading
         ? const CircularProgressIndicator()
-        : RichText(
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
-              children: spans(questionData.answer, questionData.modified),
-            ),
+        : Column(
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children:
+                      spans(questionData.modified, questionData.answer, false),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Icon(Icons.keyboard_double_arrow_down_rounded,
+                    size: 50, color: AppColors.themeColor),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children:
+                      spans(questionData.answer, questionData.modified, true),
+                ),
+              ),
+            ],
           );
   }
 }
-
