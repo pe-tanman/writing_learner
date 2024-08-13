@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/home_screen.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/themes/app_theme.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
           QuestionView.routeName: (ctx) =>  const QuestionView(),
           FillingQuestionView.routeName: (ctx) => const FillingQuestionView(),
           ProverbQuestionView.routeName: (ctx) => const ProverbQuestionView(),
+          FillingPatternQuestionView.routeName: (ctx) => const FillingPatternQuestionView(),
         });
   }
 }
