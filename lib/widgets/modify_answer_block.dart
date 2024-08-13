@@ -78,14 +78,6 @@ class ModifiedAnswerRichTextState
     );
   }
 
-  /*void _applySuggestion(GrammarError error) {
-    setState(() {
-      String newText = answeredSentence.replaceRange(
-          error.start, error.end, error.suggestedStr);
-      answeredSentence = newText;
-      _errors = [];
-    });
-  }*/
 
   int _findNextMatch(
       List<String> words1, List<String> words2, int start1, int start2) {
@@ -148,8 +140,6 @@ class ModifiedAnswerRichTextState
 
           break;
         } else {
-          // Add words up to the next match with underline
-          print(words2[nextMatch]);
           GrammarError error = GrammarError(
               start: j,
               end: nextMatch,
@@ -179,20 +169,20 @@ class ModifiedAnswerRichTextState
       }
     }
     if (ref.read(questionDataProvider)[page].wrongWordsCount > 0) {
-      getReason();
+      addReasonToErrors();
     }
 
     return spans;
   }
 
-  Future<void> getReason() async {
+  Future<void> addReasonToErrors() async {
     String questionSentence = ref.watch(questionDataProvider)[page].question;
     String answerSentence = ref.watch(questionDataProvider)[page].answer;
     String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
 
     var reasons = await GenerativeService().generateReasonMaps(
         _errors, questionSentence, answerSentence, modifiedSentence);
-    print(reasons);
+        
     for (int i = 0; i <=reasons.length-1; i++) {
       _errors[i].reason = reasons[i]['reason'];
     }

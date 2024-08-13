@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,6 +18,24 @@ class QuestionData {
     this.fillingQuestion,
     this.fillingAnswers,
   });
+}
+
+class GrammarError {
+  final int start;
+  final int end;
+  final List<String> original;
+  final List<String> suggestion;
+  String oritinalStr;
+  String suggestedStr;
+  String reason = '';
+
+  GrammarError(
+      {required this.start,
+      required this.end,
+      required this.original,
+      required this.suggestion})
+      : oritinalStr = original.join(' '),
+        suggestedStr = suggestion.join(' ');
 }
 
 @riverpod
@@ -45,12 +62,11 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     state = [];
   }
 
-  // 特定のインデックスの質問の正解単語数を増やす
-  Future<void> addAnswer(int page, String answerSentence) async {
+  // ユーザーの回答を記録＋修正 
+  Future<void> addAnswerAndModify(int page, String answerSentence) async {
     String questionSentence = state[page].question;
 
-    String modifiedSentence = await GenerativeService().generateText(
-        '以下の文章(1)は大学入試の英訳問題(2)の回答である。問題の回答として適切になるように文法と自然な言語使用の観点から修正を加えて。ただし入力が正しい場合は文章(1)を、間違っている場合は修正後の一文のみ答えること。： (1)$answerSentence (2)$questionSentence');
+    String modifiedSentence = await GenerativeService().generateModifiedSentence(questionSentence, answerSentence);
     int wrong = wrongWordsCount(answerSentence, modifiedSentence);
     state[page] = QuestionData(
       question: questionSentence,
@@ -59,7 +75,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
       modified: modifiedSentence,
     );
   }
-
+//すでに答えが設定してある場合に使用
   void addAnswerAndScore(int page, String answerSentence) async {
     String questionSentence = state[page].question;
     String modifiedSentence = state[page].modified;
