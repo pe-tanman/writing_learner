@@ -23,7 +23,7 @@ class ModifiedAnswerRichTextState
   ModifiedAnswerRichTextState(this.page);
 
   final int page;
-  final List<GrammarError> _errors = [];
+  final List<GrammarError> _errors = [];//間違いの箇所や理由を記録する
   bool isLoading = true;
   String answeredSentence = '';
   OverlayEntry? _overlayEntry;
@@ -37,6 +37,7 @@ class ModifiedAnswerRichTextState
     Overlay.of(context)?.insert(_overlayEntry!);
   }
 
+//理由を表示するカード
   OverlayEntry _createOverlayEntry(GrammarError error) {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var size = renderBox.size;
@@ -89,6 +90,7 @@ class ModifiedAnswerRichTextState
     return -1;
   }
 
+//答え合わせの時のRichTextを生成する。ついでにaddReasonToErrorsも呼び出す
   List<InlineSpan> spans(
       String answerSentence, String modifiedSentence, bool suggestionReason) {
     List<String> words1 = answerSentence.split(' ');
@@ -187,7 +189,7 @@ class ModifiedAnswerRichTextState
       _errors[i].reason = reasons[i]['reason'];
     }
   }
-
+//questionDataが正確に呼び出せなかった時に再実行する
   Future<void> laterReadQuestionData() async {
     Future.delayed(Duration(seconds: 2), () {
       var isAnswered = ref.watch(isAnsweredProvider);

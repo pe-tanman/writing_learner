@@ -7,6 +7,8 @@ ThemeData appTheme() => ThemeData(
         backgroundColor: AppColors.scaffoldBackgroundColor,
       ),
       useMaterial3: true,
+      //TODO:hiraginoフォントが上がったら戻す  
+      /*
       textTheme:  const TextTheme(
         titleMedium: TextStyle(
             fontFamily: 'hiragino',
@@ -20,8 +22,9 @@ ThemeData appTheme() => ThemeData(
           fontFamily: 'hiragino',
           fontSize: 20,
         ),
+        
 
-      ),
+      ),*/
 
       snackBarTheme: const SnackBarThemeData(showCloseIcon: true),
       cardTheme: CardTheme(
