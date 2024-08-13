@@ -80,10 +80,6 @@ flutter:
     - lib/assets/japanese_proverbs.csv
     - lib/assets/pattern_data.json
   fonts:
-    - family: NotoSansJP
-      fonts:
-        - asset: lib/assets/fonts/NotoSansJP-VariableFont_wght.ttf
-          weight: 500
     - family: hiragino
       fonts:
         - asset: lib/assets/fonts/hiragino.ttc
