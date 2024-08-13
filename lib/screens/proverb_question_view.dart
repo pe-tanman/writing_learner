@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
-import 'package:writing_learner/screens/proverb_question_page.dart';
+import 'package:writing_learner/screens/question_page.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:writing_learner/screens/question_result_screen.dart';
 
@@ -58,7 +58,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
         modified: modifiedSentence,
         wrongWordsCount: 0);
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
-    availableQuestionPages.add(ProverbQuestionPage(questionNum: nextQuestion));
+    availableQuestionPages.add(QuestionPage(questionNum: nextQuestion));
   }
 
   var answerSentence = '';
