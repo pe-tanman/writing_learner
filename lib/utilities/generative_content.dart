@@ -1,24 +1,26 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert' as convert;
+
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:http/http.dart' as http;
 
-final strProvider = Provider((ref) {
-  return 'Hello Riverpod';
-});
-
-class GenerativeService {
+class GenerativeService{
   Future<String> generateText(String prompt, bool json, var temperature) async {
-    const int maxRetries = 4;
+   
+
+
+    //gemini
+    /*
+     const int maxRetries = 4;
     int retryCount = 0;
     bool success = false;
-    var output;
-
-    await dotenv.load(fileName: '.env');
     String apiKey = dotenv.get('GEMINI_API_KEY');
     if (json) {}
     GenerationConfig config = GenerationConfig(
@@ -32,6 +34,7 @@ class GenerativeService {
         apiKey: apiKey,
         generationConfig: config);
     final content = [Content.text(prompt)];
+    
     while (retryCount < maxRetries && !success) {
       try {
         // Replace with your actual request logic
@@ -47,6 +50,85 @@ class GenerativeService {
           await Future.delayed(Duration(seconds: 2)); // Wait before retrying
         }
       }
+    }
+*/
+//gpt
+    await dotenv.load(fileName: '.env');
+    String apiKey = dotenv.get('OPENAI_API_KEY');
+    const domain = 'api.openai.com';
+    const path = 'v1/chat/completions';
+    var response;
+    var output;
+
+    if (json) {
+      response = await http.post(
+         Uri.https(domain, path),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode({
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "You are a helpful English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+            },
+            {"role": "user", "content": prompt}
+          ],
+          "temperature": temperature,
+          "tools": [
+            {
+              "type": "function",
+              "function": {
+                "name": "query",
+                "description": "Output error_array",
+                "strict": true,
+                "error_array": {
+                  "type": "array",
+                  'items': {
+                    'type': 'object',
+                    'properties': {
+                      'original': {'type': 'string'},
+                      'suggestion': {'type': 'string'},
+                      'reason': {'type': 'string'}
+                    }
+                  },
+                  "required": ['original', 'suggestion', 'reason'],
+                  "additionalProperties": false
+                }
+              }
+            }
+          ]
+        }),
+      );
+    } else {
+      response = await http.post(
+        Uri.https(domain, path),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode({
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "You are a helpful English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+            },
+            {"role": "user", "content": prompt}
+          ],
+          "temperature": temperature,
+        }),
+      );
+    }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      output = data['choices'][0]['message']['content'];
+    } else {
+      output = 'Error: ${response.statusCode}';
     }
 
     return output;
@@ -108,7 +190,7 @@ class GenerativeService {
       scheme.add({
         'original:': error.oritinalStr,
         'suggestion': error.suggestedStr,
-        'reason': 'reason'
+        'reason': {"type": "string"}
       });
     }
 
@@ -130,7 +212,6 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
 
     return reasonMaps;
   }
-
 
   Future<String> generateModifiedSentence(
       var questionSentence, var answerSentence) async {
