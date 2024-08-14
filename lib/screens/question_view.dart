@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_content.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
-import 'package:writing_learner/themes/app_theme.dart';
 import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class QuestionView extends ConsumerStatefulWidget {
@@ -39,10 +38,8 @@ class QuestionViewState extends ConsumerState<QuestionView> {
 
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
     String levelStr = ModalRoute.of(context)!.settings.arguments as String;
-    String questionSentence = await GenerativeService().generateText(
-        '$levelStr大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
-    ref
-        .read(questionDataProvider.notifier)
+    String questionSentence = await GenerativeService().generateTranslationQuestion(levelStr);
+        ref.read(questionDataProvider.notifier)
         .addQuestionSentence(questionSentence);
     availableQuestionPages.add(QuestionPage(
       questionNum: nextQuestion,

@@ -23,7 +23,7 @@ class ModifiedAnswerRichTextState
   ModifiedAnswerRichTextState(this.page);
 
   final int page;
-  final List<GrammarError> _errors = [];
+  final List<GrammarError> _errors = [];//間違いの箇所や理由を記録する
   bool isLoading = true;
   String answeredSentence = '';
   OverlayEntry? _overlayEntry;
@@ -37,6 +37,7 @@ class ModifiedAnswerRichTextState
     Overlay.of(context)?.insert(_overlayEntry!);
   }
 
+//理由を表示するカード
   OverlayEntry _createOverlayEntry(GrammarError error) {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var size = renderBox.size;
@@ -78,14 +79,6 @@ class ModifiedAnswerRichTextState
     );
   }
 
-  /*void _applySuggestion(GrammarError error) {
-    setState(() {
-      String newText = answeredSentence.replaceRange(
-          error.start, error.end, error.suggestedStr);
-      answeredSentence = newText;
-      _errors = [];
-    });
-  }*/
 
   int _findNextMatch(
       List<String> words1, List<String> words2, int start1, int start2) {
@@ -97,6 +90,7 @@ class ModifiedAnswerRichTextState
     return -1;
   }
 
+//答え合わせの時のRichTextを生成する。ついでにaddReasonToErrorsも呼び出す
   List<InlineSpan> spans(
       String answerSentence, String modifiedSentence, bool suggestionReason) {
     List<String> words1 = answerSentence.split(' ');
@@ -148,8 +142,6 @@ class ModifiedAnswerRichTextState
 
           break;
         } else {
-          // Add words up to the next match with underline
-          print(words2[nextMatch]);
           GrammarError error = GrammarError(
               start: j,
               end: nextMatch,
@@ -179,25 +171,25 @@ class ModifiedAnswerRichTextState
       }
     }
     if (ref.read(questionDataProvider)[page].wrongWordsCount > 0) {
-      getReason();
+      addReasonToErrors();
     }
 
     return spans;
   }
 
-  Future<void> getReason() async {
+  Future<void> addReasonToErrors() async {
     String questionSentence = ref.watch(questionDataProvider)[page].question;
     String answerSentence = ref.watch(questionDataProvider)[page].answer;
     String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
 
     var reasons = await GenerativeService().generateReasonMaps(
         _errors, questionSentence, answerSentence, modifiedSentence);
-    print(reasons);
+        
     for (int i = 0; i <=reasons.length-1; i++) {
       _errors[i].reason = reasons[i]['reason'];
     }
   }
-
+//questionDataが正確に呼び出せなかった時に再実行する
   Future<void> laterReadQuestionData() async {
     Future.delayed(Duration(seconds: 2), () {
       var isAnswered = ref.watch(isAnsweredProvider);

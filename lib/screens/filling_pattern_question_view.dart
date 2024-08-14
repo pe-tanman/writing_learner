@@ -103,6 +103,7 @@ print(fillQuestion);
         body: isLoading
             ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
+              //スワイプを制限
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&
                       notification.metrics is PageMetrics) {
@@ -112,12 +113,10 @@ print(fillQuestion);
                         ref.watch(isAnsweredProvider)) {
                     } else if (metrics.page! < currentPage.toDouble()) {
                       _pageController.jumpToPage(currentPage);
-                      print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
                         !ref.watch(isAnsweredProvider)) {
                       _pageController.jumpToPage(currentPage);
-                      print('prohibited');
                       return true;
                     }
                   }

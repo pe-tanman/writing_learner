@@ -52,7 +52,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                       showAnswer = true;
                     });
                     
-                    await notifier.addAnswer(questionNum, answerSentence);
+                    await notifier.addAnswerAndModify(questionNum, answerSentence);
                     ref.read(isAnsweredProvider.notifier).state = true;
                     
                   },
