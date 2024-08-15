@@ -6,7 +6,7 @@ import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:writing_learner/themes/app_color.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:writing_learner/widgets/suggestion_card.dart';
 
 class ModifiedAnswerRichText extends ConsumerStatefulWidget {

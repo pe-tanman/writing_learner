@@ -12,7 +12,7 @@ import 'package:writing_learner/provider/question_provider.dart';
 import 'package:http/http.dart' as http;
 
 class GenerativeService{
-  Future<String> generateText(String prompt, bool json, var temperature) async {
+  Future<String> generateText(String prompt, bool json, var temperature, [String? jsonScheme]) async {
    
 
 
@@ -64,7 +64,7 @@ class GenerativeService{
       response = await http.post(
          Uri.https(domain, path),
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
           'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
@@ -83,19 +83,19 @@ class GenerativeService{
               "type": "function",
               "function": {
                 "name": "query",
-                "description": "Output error_array",
+                "description": "output the array",
                 "strict": true,
                 "error_array": {
                   "type": "array",
-                  'items': {
-                    'type': 'object',
-                    'properties': {
-                      'original': {'type': 'string'},
-                      'suggestion': {'type': 'string'},
-                      'reason': {'type': 'string'}
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "original": {"type": "string"},
+                      "suggestion": {"type": "string"},
+                      "reason": {"type": "string"}
                     }
                   },
-                  "required": ['original', 'suggestion', 'reason'],
+                  "required": ["original", "suggestion", "reason"],
                   "additionalProperties": false
                 }
               }
@@ -106,12 +106,13 @@ class GenerativeService{
     } else {
       response = await http.post(
         Uri.https(domain, path),
+        
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          "model": "gpt-4o-2024-08-06",
+          "model": "gpt-4o-mini",
           "messages": [
             {
               "role": "system",
@@ -125,7 +126,8 @@ class GenerativeService{
       );
     }
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      String responseData = utf8.decode(response.bodyBytes).toString();
+      var data = convert.jsonDecode(responseData);
       output = data['choices'][0]['message']['content'];
     } else {
       output = 'Error: ${response.statusCode}';
@@ -185,7 +187,7 @@ class GenerativeService{
     String output = '';
     List<Map> scheme = [{}];
     List<Map<String, dynamic>> reasonMaps = [{}];
-
+/*
     for (var error in errors) {
       scheme.add({
         'original:': error.oritinalStr,
@@ -193,7 +195,7 @@ class GenerativeService{
         'reason': {"type": "string"}
       });
     }
-
+    
     var prompt = """
   Question: $questionSentence
   Answer: $answeredSentence
@@ -204,6 +206,14 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Using this JSON schema:
     List<Map> error = ${scheme.toString()}
   Return error
+  """;
+  */
+  var prompt =  """
+  Question: $questionSentence
+  Answer: $answeredSentence
+  Modified Answer: $modifiedSentence
+
+  Task: Replace 'reason' with brief reason in Japanese why 'original was modified to suggestion in the Answer to the translation Japanese to English Question.
   """;
 
     output = await generateText(prompt, true, 0.0);

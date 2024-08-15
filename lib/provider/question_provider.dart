@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class QuestionData {

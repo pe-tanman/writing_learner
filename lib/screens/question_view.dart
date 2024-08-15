@@ -3,7 +3,7 @@ import 'package:writing_learner/screens/question_page.dart';
 import 'package:writing_learner/screens/question_result_screen.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/widgets/loading_indicator.dart';
