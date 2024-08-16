@@ -11,11 +11,9 @@ import 'dart:convert' as convert;
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:http/http.dart' as http;
 
-class GenerativeService{
-  Future<String> generateText(String prompt, bool json, var temperature, [String? jsonScheme]) async {
-   
-
-
+class GenerativeService {
+  Future<String> generateText(String prompt, bool json, var temperature,
+      [Map? jsonScheme]) async {
     //gemini
     /*
      const int maxRetries = 4;
@@ -60,9 +58,9 @@ class GenerativeService{
     var response;
     var output;
 
-    if (json) {
+    if (json && jsonScheme != null) {
       response = await http.post(
-         Uri.https(domain, path),
+        Uri.https(domain, path),
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
           'Authorization': 'Bearer $apiKey',
@@ -78,35 +76,12 @@ class GenerativeService{
             {"role": "user", "content": prompt}
           ],
           "temperature": temperature,
-          "tools": [
-            {
-              "type": "function",
-              "function": {
-                "name": "query",
-                "description": "output the array",
-                "strict": true,
-                "error_array": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "original": {"type": "string"},
-                      "suggestion": {"type": "string"},
-                      "reason": {"type": "string"}
-                    }
-                  },
-                  "required": ["original", "suggestion", "reason"],
-                  "additionalProperties": false
-                }
-              }
-            }
-          ]
+          "tools": {"type": "function", "function": jsonScheme}
         }),
       );
     } else {
       response = await http.post(
         Uri.https(domain, path),
-        
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $apiKey',
@@ -137,35 +112,56 @@ class GenerativeService{
   }
 
   Future<Map<String, dynamic>> generateFillingQuestion() async {
-    var scheme = """
-{Japanese Sentence: "", English Sentence: "", Filling Question: ""}
-    """;
+    Map scheme = {
+      "Japanese Sentence": {"type": "String"},
+      "English Sentence": {"type": "String"},
+      "Filling Question": {"type": "String"}
+    };
+    var jsonScheme = {
+      "type": "function",
+      "function": {
+        "name": "query",
+        "description": "output the question objet",
+        "strict": true,
+        "error_array": {"type": "object", "properties": scheme},
+        "required": ["original", "suggestion", "reason"],
+        "additionalProperties": false
+      }
+    };
     var prompt = """
     Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same translation with a blank space ___ in important expressions for English learners. The sentence should be a random output of a sentence that can be used for university entrance exams. Output Japanse sentence, its English translation, and the same translation with a blank space ___ in important expressions for English learners.
-  Using this JSON schema:
-    Map<String, dynamic> scheme = ${scheme.toString()}
-  Return scheme
+  Using this JSON schema
   """;
 
-    final output = await generateText(prompt, true, 0.5);
+    final output = await generateText(prompt, true, 0.5, jsonScheme);
 
     return convert.jsonDecode(output);
   }
 
   Future<Map<String, dynamic>> generateFillingPatternQuestion(
       var patternData) async {
-    var scheme = """
-{Japanese Sentence: "", English Sentence: "", Filling Question: ""}
-    """;
+    Map scheme = {
+      "Japanese Sentence": {"type": "String"},
+      "English Sentence": {"type": "String"},
+      "Filling Question": {"type": "String"}
+    };
+    var jsonScheme = {
+      "type": "function",
+      "function": {
+        "name": "query",
+        "description": "output the question objet",
+        "strict": true,
+        "error_array": {"type": "object", "properties": scheme},
+        "required": ["original", "suggestion", "reason"],
+        "additionalProperties": false
+      }
+    };
     var prompt = """
   Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same translation replacing each important expression for English learners with a blank space ___. The sentence should be a random output of a sentence that can be used for university entrance exams. 
   Note: Use expression: $patternData
-  Using this JSON schema:
-    Map<String, dynamic> scheme = ${scheme.toString()}
-  Return scheme
   """;
 
-    final output = await generateText(prompt, true, 0.5);
+    final output = await generateText(prompt, true, 0.5, jsonScheme);
 
     Map<String, dynamic> result = convert.jsonDecode(output);
     return result;
@@ -208,16 +204,86 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Return error
   """;
   */
-  var prompt =  """
+    var prompt = """
   Question: $questionSentence
-  Answer: $answeredSentence
-  Modified Answer: $modifiedSentence
+Answer:  $answeredSentence
 
-  Task: Replace 'reason' with brief reason in Japanese why 'original was modified to suggestion in the Answer to the translation Japanese to English Question.
-  """;
+Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts and the suggested parts, and the reason as a form of an array. 
 
-    output = await generateText(prompt, true, 0.0);
+example:  "error_array": [
+    {
+      "original_phrase": "is",
+      "suggested_phrase": "has",
+      "reason": "現在完了形の方が文脈に即す。"
+    },
+ {
+      "original_phrase": "",
+      "suggested_phrase": "for",
+      "reason": "for breakfastが正しい表現"
+    }
+  ],
+  "modified_sentence": "He has not decided what to eat for breakfast yet."  """;
+  /*
+    for (var error in errors) {
+      scheme.add({
+        "type": "object",
+        "properties": {
+          "original": {"type": "string"},
+          "suggestion": {"type": "string"},
+          "reason": {"type": "string"}
+        }
+      });
+    }*/
+    var jsonScheme = {
+  "name": "query",
+  "description": "Output the array 'error_phrases'",
+  "strict": true,
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "error_array": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": { 
+            "original_phrase": {
+              "type": "string",
+              "description": "The original word or phrase that is suggested to be replaced."
+            },
+            "suggested_phrase": {
+              "type": "string",
+              "description": "The suggested word or phrase to replace the original."
+            },
+            "reason": {
+              "type": "string",
+              "description": "The reason for the suggested replacement."
+            }
+          },
+          "required": [
+            "original_phrase",
+            "suggested_phrase",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "modified_sentence": {
+        "type": "string",
+        "description": "The sentence after all modifications have been applied."
+      }
+    },
+    "required": [
+      "error_array",
+      "modified_sentence"
+    ],
+    "additionalProperties": false
+  }
+};
 
+    
+
+    output = await generateText(prompt, true, 0.0, jsonScheme);
+    print(output);
     reasonMaps = jsonDecode(output).cast<Map<String, dynamic>>();
 
     return reasonMaps;
