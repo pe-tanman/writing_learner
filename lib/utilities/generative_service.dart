@@ -71,7 +71,7 @@ class GenerativeService {
             {
               "role": "system",
               "content":
-                  "You are a helpful English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+                  "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
             },
             {"role": "user", "content": prompt}
           ],
@@ -204,9 +204,10 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Question: $questionSentence
 Answer:  $answeredSentence
 
-Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts and the suggested parts, and the reason as a form of an array. 
+Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts, the suggested parts, and the reason as a form of an array. 
+Note: the reaason should be in Japanese.
 
-example:  "error_array": [
+For example:  "error_array": [
     {
       "original_phrase": "is",
       "suggested_phrase": "has",
