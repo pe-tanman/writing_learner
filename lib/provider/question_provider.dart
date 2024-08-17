@@ -9,33 +9,29 @@ class QuestionData {
   final int wrongWordsCount;
   final String? fillingQuestion;
   final List<String>? fillingAnswers;
+  final List<GrammarError> errors;
 
   QuestionData({
     required this.question,
     required this.answer,
     required this.wrongWordsCount,
     required this.modified,
+    required this.errors,
     this.fillingQuestion,
     this.fillingAnswers,
   });
 }
 
 class GrammarError {
-  final int start;
-  final int end;
-  final List<String> original;
-  final List<String> suggestion;
-  String oritinalStr;
-  String suggestedStr;
-  String reason = '';
+  final String original;
+  final String suggestion;
+  final String reason;
 
-  GrammarError(
-      {required this.start,
-      required this.end,
-      required this.original,
-      required this.suggestion})
-      : oritinalStr = original.join(' '),
-        suggestedStr = suggestion.join(' ');
+  GrammarError({
+    required this.original,
+    required this.suggestion,
+    required this.reason,
+  });
 }
 
 @riverpod
@@ -49,6 +45,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
       answer: '',
       wrongWordsCount: 0,
       modified: '',
+      errors: [],
     );
     state = [...state, questionData];
   }
@@ -62,19 +59,34 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     state = [];
   }
 
-  // ユーザーの回答を記録＋修正 
+  // ユーザーの回答を記録＋修正
   Future<void> addAnswerAndModify(int page, String answerSentence) async {
-    String questionSentence = state[page].question;
+    List<GrammarError> errors = [];
 
-    String modifiedSentence = await GenerativeService().generateModifiedSentence(questionSentence, answerSentence);
+    String questionSentence = state[page].question;
+    var output = await GenerativeService()
+        .generateReasonMaps(questionSentence, answerSentence);
+    var errorMap = output['error_array'];
+    var modifiedSentence = output['modified_sentence'];
     int wrong = wrongWordsCount(answerSentence, modifiedSentence);
+    for (int i = 0; i <= errorMap.length - 1; i++) {
+      var error = errorMap[i];
+      var original = error['original_phrase'];
+      var suggestion = error['suggested_phrase'];
+      var reason = error['reason'];
+      errors.add(GrammarError(
+          original: original,
+          suggestion: suggestion,
+          reason: reason));
+    }
     state[page] = QuestionData(
-      question: questionSentence,
-      answer: answerSentence,
-      wrongWordsCount: wrong,
-      modified: modifiedSentence,
-    );
+        question: questionSentence,
+        answer: answerSentence,
+        wrongWordsCount: wrong,
+        modified: modifiedSentence,
+        errors: errors);
   }
+
 //すでに答えが設定してある場合に使用
   void addAnswerAndScore(int page, String answerSentence) async {
     String questionSentence = state[page].question;
@@ -82,12 +94,13 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     String? fillingQuestion = state[page].fillingQuestion;
     int wrong = wrongWordsCount(answerSentence, modifiedSentence);
     state[page] = QuestionData(
-      question: questionSentence,
-      answer: answerSentence,
-      wrongWordsCount: wrong,
-      modified: modifiedSentence,
-      fillingQuestion: fillingQuestion
-    );
+        question: questionSentence,
+        answer: answerSentence,
+        wrongWordsCount: wrong,
+        modified: modifiedSentence,
+        fillingQuestion: fillingQuestion,
+        errors: []);
+        //TODO:errorsを追加する
     //isAnsweredが変化してもbuild treeで反応しない→反応させる方法はあるか、別の方法（isAnsweredProviderをリストにする）or currentPageみたいなのをつけることでそこまでは一括で回答済みにする＋isAnsweredProvider戻れる必要性がない
   }
 

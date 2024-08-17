@@ -23,7 +23,7 @@ class ModifiedAnswerRichTextState
   ModifiedAnswerRichTextState(this.page);
 
   final int page;
-  final List<GrammarError> _errors = [];//間違いの箇所や理由を記録する
+  final List<GrammarError> _errors = []; //間違いの箇所や理由を記録する
   bool isLoading = true;
   String answeredSentence = '';
   OverlayEntry? _overlayEntry;
@@ -63,7 +63,7 @@ class ModifiedAnswerRichTextState
                   child: GestureDetector(
                     onTap: () {},
                     child: SuggestionCard(
-                      suggestion: error.suggestedStr,
+                      suggestion: error.suggestion,
                       reason: error.reason,
                       onApply: () {
                         _overlayEntry?.remove();
@@ -78,7 +78,6 @@ class ModifiedAnswerRichTextState
       ),
     );
   }
-
 
   int _findNextMatch(
       List<String> words1, List<String> words2, int start1, int start2) {
@@ -98,6 +97,7 @@ class ModifiedAnswerRichTextState
     List<InlineSpan> spans = [];
 
     int i = 0, j = 0;
+    var errorNum = 0;
     while (i < words1.length || j < words2.length) {
       if (i < words1.length && j < words2.length && words1[i] == words2[j]) {
         //matching
@@ -115,14 +115,10 @@ class ModifiedAnswerRichTextState
 
         if (nextMatch == -1 || words1.indexOf(words2[nextMatch], i) == -1) {
           // No more matches, add all remaining words with underline
-          GrammarError error = GrammarError(
-              start: j,
-              end: words2.length - 1,
-              original: words1.sublist(i, words1.length),
-              suggestion: words2.sublist(j, words2.length));
-          _errors.add(error);
+          errorNum++;
 
           while (j < words2.length) {
+            final currentErrorNum = errorNum;
             spans.add(TextSpan(
               text: '${words2[j]} ',
               style: TextStyle(
@@ -132,9 +128,9 @@ class ModifiedAnswerRichTextState
                       suggestionReason ? TextDecoration.underline : null),
               recognizer: TapGestureRecognizer()
                 ..onTap = suggestionReason
-                    ? () {
-                        _showSuggestionCard(error);
-                      }
+                    ? () =>
+                        _showSuggestionCard(ref.read(questionDataProvider)[page]
+                            .errors[currentErrorNum-1]) //errorNumは1から始まる
                     : null,
             ));
             j++;
@@ -142,14 +138,10 @@ class ModifiedAnswerRichTextState
 
           break;
         } else {
-          GrammarError error = GrammarError(
-              start: j,
-              end: nextMatch,
-              original: words1.sublist(i, words1.indexOf(words2[nextMatch], i)),
-              suggestion: words2.sublist(j, nextMatch));
-          _errors.add(error);
+          errorNum++;
 
           while (j < nextMatch) {
+            final currentErrorNum = errorNum;
             spans.add(TextSpan(
               text: '${words2[j]} ',
               style: TextStyle(
@@ -159,9 +151,9 @@ class ModifiedAnswerRichTextState
                       suggestionReason ? TextDecoration.underline : null),
               recognizer: TapGestureRecognizer()
                 ..onTap = suggestionReason
-                    ? () {
-                        _showSuggestionCard(error);
-                      }
+                    ? () =>
+                        _showSuggestionCard(ref.read(questionDataProvider)[page]
+                            .errors[currentErrorNum-1])
                     : null,
             ));
             j++;
@@ -170,25 +162,10 @@ class ModifiedAnswerRichTextState
         }
       }
     }
-    if (ref.read(questionDataProvider)[page].wrongWordsCount > 0) {
-      addReasonToErrors();
-    }
 
     return spans;
   }
 
-  Future<void> addReasonToErrors() async {
-    String questionSentence = ref.watch(questionDataProvider)[page].question;
-    String answerSentence = ref.watch(questionDataProvider)[page].answer;
-    String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
-
-    var reasons = await GenerativeService().generateReasonMaps(
-        _errors, questionSentence, answerSentence, modifiedSentence);
-        
-    for (int i = 0; i <=reasons.length-1; i++) {
-      _errors[i].reason = reasons[i]['reason'];
-    }
-  }
 //questionDataが正確に呼び出せなかった時に再実行する
   Future<void> laterReadQuestionData() async {
     Future.delayed(Duration(seconds: 2), () {

@@ -76,7 +76,7 @@ class GenerativeService {
             {"role": "user", "content": prompt}
           ],
           "temperature": temperature,
-          "tools": {"type": "function", "function": jsonScheme}
+          "response_format": {"type": "json_schema", "json_schema": jsonScheme}
         }),
       );
     } else {
@@ -173,16 +173,12 @@ class GenerativeService {
     return response;
   }
 
-//TODO:ここの精度と応答速度を出すか：小さいモデルでファインチューニングするか、グチャグチャな文章でどう出すか、問題生成
-//TODO:
-  Future<List<Map<String, dynamic>>> generateReasonMaps(
-      List<GrammarError> errors,
+  Future<Map<String, dynamic>> generateReasonMaps(
       String questionSentence,
-      String answeredSentence,
-      String modifiedSentence) async {
+      String answeredSentence) async {
     String output = '';
     List<Map> scheme = [{}];
-    List<Map<String, dynamic>> reasonMaps = [{}];
+    Map<String, dynamic> reasonMaps = {};
 /*
     for (var error in errors) {
       scheme.add({
@@ -238,7 +234,7 @@ example:  "error_array": [
   "name": "query",
   "description": "Output the array 'error_phrases'",
   "strict": true,
-  "parameters": {
+  "schema": {
     "type": "object",
     "properties": {
       "error_array": {
@@ -284,7 +280,7 @@ example:  "error_array": [
 
     output = await generateText(prompt, true, 0.0, jsonScheme);
     print(output);
-    reasonMaps = jsonDecode(output).cast<Map<String, dynamic>>();
+    reasonMaps = jsonDecode(output);
 
     return reasonMaps;
   }

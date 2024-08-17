@@ -55,7 +55,8 @@ print(fillQuestion);
         answer: '',
         wrongWordsCount: 0,
         modified: fillQuestion['English Sentence'],
-        fillingQuestion: fillQuestion['Filling Question'],));
+        fillingQuestion: fillQuestion['Filling Question'],
+        errors: []));
     availableQuestionPages.add(FillingQuestionPage(questionNum: nextQuestion));
   }
 

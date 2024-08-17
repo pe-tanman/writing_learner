@@ -56,7 +56,9 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
         question: questionSentence,
         answer: '',
         modified: modifiedSentence,
-        wrongWordsCount: 0);
+        wrongWordsCount: 0,
+          errors: []);
+      
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
     availableQuestionPages.add(QuestionPage(questionNum: nextQuestion));
   }
