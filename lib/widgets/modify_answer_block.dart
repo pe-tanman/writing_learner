@@ -121,7 +121,7 @@ class ModifiedAnswerRichTextState
           text: originalPhrase,
           style: TextStyle(
             fontSize: 15,
-            color: AppColors.accentColor,
+            color: AppColors.accentTextColor,
           ),
         ));
 
@@ -175,7 +175,7 @@ class ModifiedAnswerRichTextState
           style: TextStyle(
             fontSize: 15,
             decoration: TextDecoration.underline,
-            color: AppColors.accentColor,
+            color: AppColors.accentTextColor,
           ),
           recognizer: TapGestureRecognizer()
             ..onTap = () {

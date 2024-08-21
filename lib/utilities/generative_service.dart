@@ -1,14 +1,8 @@
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:dart_openai/dart_openai.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert' as convert;
 
-import 'package:writing_learner/provider/question_provider.dart';
 import 'package:http/http.dart' as http;
 
 class GenerativeService {
@@ -55,7 +49,7 @@ class GenerativeService {
     String apiKey = dotenv.get('OPENAI_API_KEY');
     const domain = 'api.openai.com';
     const path = 'v1/chat/completions';
-    var response;
+    http.Response response;
     var output;
 
     if (json && jsonScheme != null) {

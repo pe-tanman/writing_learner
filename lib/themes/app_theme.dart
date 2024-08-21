@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'app_color.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 ThemeData appTheme() => ThemeData(
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.scaffoldBackgroundColor,
       ),
       useMaterial3: true,

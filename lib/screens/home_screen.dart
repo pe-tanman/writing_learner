@@ -28,69 +28,74 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          title: SizedBox(height:70, child:  Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Image.asset('lib/assets/wridge.png'),
+          )),
         ),
-        body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 20),
-            Image.asset('lib/assets/l01_rectangle.png'),
-            const SizedBox(height: 20),
-             Padding(
-               padding: const EdgeInsets.all(8.0),
-               child: Row(
-                children: [
-                  Text(
-                    'デイリーチャレンジ',
-                    style: appTheme().textTheme.headlineMedium,
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+           const SizedBox(height: 20),
+               Padding(
+                 padding: const EdgeInsets.all(8.0),
+                 child: Row(
+                  children: [
+                    Text(
+                      'デイリーチャレンジ',
+                      style: appTheme().textTheme.headlineMedium,
+                    ),
+                    const Icon(Icons.arrow_right_alt)
+                  ],
+                             ),
+               ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  height: 200,
+                  width: 400,
+                  decoration: BoxDecoration(
+                    color: AppColors.themeColor,
+                    borderRadius: BorderRadius.circular(20),
+                    image: const DecorationImage(image:  AssetImage('lib/assets/coming_wide.png'), fit: BoxFit.fill),
                   ),
-                  Icon(Icons.arrow_right_alt)
-                ],
-                           ),
-             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                height: 200,
-                width: 400,
-                decoration: BoxDecoration(
-                  color: AppColors.themeColor,
-                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text('デイリーチャレンジ'),
               ),
-            ),
-            const SizedBox(height: 20),
-             Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Text(
-                    '最近学習した教材',
-                    style: appTheme().textTheme.headlineMedium,
-                  ),
-                  Icon(Icons.arrow_right_alt)
-                ],
+              const SizedBox(height: 20),
+               Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Text(
+                      '最近学習した教材',
+                      style: appTheme().textTheme.headlineMedium,
+                    ),
+                    const Icon(Icons.arrow_right_alt)
+                  ],
+                ),
               ),
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildItem('AI東大英訳', '和文英訳', 'lib/assets/ai_image.jpeg',
-                      QuestionView.routeName, context, ref, '東京'),
-                  _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/ai_image.jpeg',
-                      FillingQuestionView.routeName, context, ref, '東京'),
-                  _buildItem('ことわざ', '表現', 'lib/assets/ai_image.jpeg',
-                      ProverbQuestionView.routeName, context, ref),
-                  _buildItem('構文150', '構文', 'lib/assets/ai_image.jpeg',
-                      FillingPatternQuestionView.routeName, context, ref, "東京"),
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildItem('AI東大英訳', '和文英訳', 'lib/assets/blue.png',
+                        QuestionView.routeName, context, ref, '東京'),
+                    _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/blue.png',
+                        FillingQuestionView.routeName, context, ref, '東京'),
+                    _buildItem('ことわざ', '表現', 'lib/assets/coming_square.png',
+                        ProverbQuestionView.routeName, context, ref),
+                    _buildItem('構文150', '構文', 'lib/assets/coming_square.png',
+                        FillingPatternQuestionView.routeName, context, ref),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+                ),
         ),
-      ),
     );
   }
   Widget _buildItem(String title, String discription, var imagePath, var route,
