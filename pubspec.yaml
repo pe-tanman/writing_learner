@@ -87,13 +87,9 @@ flutter:
     - family: hiragino
       fonts:
         - asset: lib/assets/fonts/hiragino.ttc
-flutter_icons:
-  ios: true
-  image_path: "lib/assets/icon_square.png"
-  remove_alpha_ios: true
-  android: true
-  adaptive_icon_background: "lib/assets/icon_background.png"
-  adaptive_icon_foreground: "lib/assets/icon_foreground.png"
+          
+          
+
           
 
 

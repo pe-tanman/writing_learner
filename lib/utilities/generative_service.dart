@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert' as convert;
 
@@ -106,30 +107,54 @@ class GenerativeService {
   }
 
   Future<Map<String, dynamic>> generateFillingQuestion() async {
-    Map scheme = {
-      "Japanese Sentence": {"type": "String"},
-      "English Sentence": {"type": "String"},
-      "Filling Question": {"type": "String"}
-    };
     var jsonScheme = {
-      "type": "function",
-      "function": {
-        "name": "query",
-        "description": "output the question objet",
-        "strict": true,
-        "error_array": {"type": "object", "properties": scheme},
-        "required": ["original", "suggestion", "reason"],
+      "name": "query",
+      "description": "Output the filling_question",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "filling_question": {
+            "type": "object",
+            "properties": {
+              "Japanese_sentence": {
+                "type": "string",
+                "description":
+                    "A Japanese sentence that can be used for difficult university entrance exams in Japan."
+              },
+              "English_sentence": {
+                "type": "string",
+                "description": "The translation of the Japanese sentence."
+              },
+              "filling_question": {
+                "type": "string",
+                "description":
+                    "Replace the important words or phrases with a blank space ___"
+              }
+            },
+            "required": [
+              "Japanese_sentence",
+              "English_sentence",
+              "filling_question"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": ['filling_question'],
         "additionalProperties": false
       }
     };
+
     var prompt = """
-    Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same translation with a blank space ___ in important expressions for English learners. The sentence should be a random output of a sentence that can be used for university entrance exams. Output Japanse sentence, its English translation, and the same translation with a blank space ___ in important expressions for English learners.
+    Task: Generate Japanse sentence for a difficult Japanese university entrance exam, its English translation, and the same English translation with a blank space ___ in important expressions for English learners. The sentence should be a random output of a sentence that can be used for university entrance exams. Output Japanse sentence, its English translation, and the same translation with a blank space ___ in important expressions for English learners.
   Using this JSON schema
+
+  For example:  "schema":{"Japanese_sentence":"調理は、事実上、噛んで消化するという作業の一部を引き受け、外部のエネルギー源を用いて、われわれの身体の外部で、それを遂行してくれたのである。","English_sentence":"Cooking, in effect, took part of the work of chewing and digesting and carried it out outside our bodies, using an external energy source.","Filling_question":"Cooking, in effect, took ___ of the work of ___ and ___ and ___ it ___ outside our bodies, using an ___ energy source."}
   """;
 
     final output = await generateText(prompt, true, 0.5, jsonScheme);
-
-    return convert.jsonDecode(output);
+    var output_Map = convert.jsonDecode(output)['filling_question'];
+    return output_Map;
   }
 
   Future<Map<String, dynamic>> generateFillingPatternQuestion(
@@ -162,16 +187,22 @@ class GenerativeService {
   }
 
   Future<String> generateTranslationQuestion(var levelStr) async {
-    var prompt = '$levelStr大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。';
+    var example = '';
+    if (levelStr == "Tokyo") {
+      example =
+          "調理は、事実上、噛んで消化するという作業の一部を引き受け、外部のエネルギー源を用いて、われわれの身体の外部で、それを遂行してくれたのである。";
+    } else if (levelStr == 'Nagoya') {
+      example = '趣味に専念することによって、より深い人生観が生まれるのです';
+    }
+    var prompt =
+        'Task: Generate Japanse sentence for a translation(Japanese to English) task in $levelStr University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.';
     var response = await generateText(prompt, false, 1.0);
     return response;
   }
 
   Future<Map<String, dynamic>> generateReasonMaps(
-      String questionSentence,
-      String answeredSentence) async {
+      String questionSentence, String answeredSentence) async {
     String output = '';
-    List<Map> scheme = [{}];
     Map<String, dynamic> reasonMaps = {};
 /*
     for (var error in errors) {
@@ -199,7 +230,7 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
 Answer:  $answeredSentence
 
 Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts, the suggested parts, and the reason as a form of an array. 
-Note: the reaason should be in Japanese.
+Note: the suggested_phrase mut be in English, and the reason must be in Japanese.
 
 For example:  "error_array": [
     {
@@ -214,7 +245,7 @@ For example:  "error_array": [
     }
   ],
   "modified_sentence": "He has not decided what to eat for breakfast yet."  """;
-  /*
+    /*
     for (var error in errors) {
       scheme.add({
         "type": "object",
@@ -226,52 +257,47 @@ For example:  "error_array": [
       });
     }*/
     var jsonScheme = {
-  "name": "query",
-  "description": "Output the array 'error_phrases'",
-  "strict": true,
-  "schema": {
-    "type": "object",
-    "properties": {
-      "error_array": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": { 
-            "original_phrase": {
-              "type": "string",
-              "description": "The original word or phrase that is suggested to be replaced."
-            },
-            "suggested_phrase": {
-              "type": "string",
-              "description": "The suggested word or phrase to replace the original."
-            },
-            "reason": {
-              "type": "string",
-              "description": "The reason for the suggested replacement."
+      "name": "query",
+      "description": "Output the array 'error_phrases'",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "error_array": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "original_phrase": {
+                  "type": "string",
+                  "description":
+                      "A original English word or phrase that is suggested to be replaced."
+                },
+                "suggested_phrase": {
+                  "type": "string",
+                  "description":
+                      "A suggested English word or phrase to replace the original."
+                },
+                "reason": {
+                  "type": "string",
+                  "description":
+                      "The reason for the suggested replacement in Japanese."
+                }
+              },
+              "required": ["original_phrase", "suggested_phrase", "reason"],
+              "additionalProperties": false
             }
           },
-          "required": [
-            "original_phrase",
-            "suggested_phrase",
-            "reason"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "modified_sentence": {
-        "type": "string",
-        "description": "The sentence after all modifications have been applied."
+          "modified_sentence": {
+            "type": "string",
+            "description":
+                "The sentence after all modifications have been applied."
+          }
+        },
+        "required": ["error_array", "modified_sentence"],
+        "additionalProperties": false
       }
-    },
-    "required": [
-      "error_array",
-      "modified_sentence"
-    ],
-    "additionalProperties": false
-  }
-};
-
-    
+    };
 
     output = await generateText(prompt, true, 0.0, jsonScheme);
     print(output);

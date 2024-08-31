@@ -40,13 +40,17 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
        Map fillQuestion =
         await GenerativeService().generateFillingQuestion();
+        print(fillQuestion);
+        print(fillQuestion['Japanese_sentence']);  
+        print(fillQuestion['English_sentence']);
+        print(fillQuestion['filling_question']);
 
-    ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
-          question: fillQuestion['Japanese Sentence'],
+        ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
+          question: fillQuestion['Japanese_sentence'],
           answer: '',
           wrongWordsCount: 0,
-          modified: fillQuestion['English Sentence'],
-          fillingQuestion: fillQuestion['Filling Question'],
+          modified: fillQuestion['English_sentence'],
+          fillingQuestion: fillQuestion['filling_question'],
           errors: []
         ));
     availableQuestionPages.add(FillingQuestionPage(questionNum: nextQuestion));

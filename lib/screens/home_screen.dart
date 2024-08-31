@@ -81,10 +81,12 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildItem('AI東大英訳', '和文英訳', 'lib/assets/blue.png',
-                        QuestionView.routeName, context, ref, '東京'),
-                    _buildItem('AI東大穴埋め', '和文英訳', 'lib/assets/blue.png',
-                        FillingQuestionView.routeName, context, ref, '東京'),
+                    _buildItem('AI最難関英訳', '和文英訳', 'lib/assets/blue.png',
+                        QuestionView.routeName, context, ref, 'Tokyo'),
+                        _buildItem('AI難関英訳', '和文英訳', 'lib/assets/blue.png',
+                        QuestionView.routeName, context, ref, 'Nagoya'),
+                    _buildItem('AI最難関穴埋め', '和文英訳', 'lib/assets/coming_square.png',
+                        FillingQuestionView.routeName, context, ref, 'Tokyo'),
                     _buildItem('ことわざ', '表現', 'lib/assets/coming_square.png',
                         ProverbQuestionView.routeName, context, ref),
                     _buildItem('構文150', '構文', 'lib/assets/coming_square.png',
