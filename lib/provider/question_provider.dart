@@ -68,16 +68,14 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         .generateReasonMaps(questionSentence, answerSentence);
     var errorMap = output['error_array'];
     var modifiedSentence = output['modified_sentence'];
-    int wrong = wrongWordsCount(answerSentence, modifiedSentence);
+    int wrong = wrongWordsPercent(answerSentence, modifiedSentence);
     for (int i = 0; i <= errorMap.length - 1; i++) {
       var error = errorMap[i];
       var original = error['original_phrase'];
       var suggestion = error['suggested_phrase'];
       var reason = error['reason'];
       errors.add(GrammarError(
-          original: original,
-          suggestion: suggestion,
-          reason: reason));
+          original: original, suggestion: suggestion, reason: reason));
     }
     state[page] = QuestionData(
         question: questionSentence,
@@ -92,7 +90,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     String questionSentence = state[page].question;
     String modifiedSentence = state[page].modified;
     String? fillingQuestion = state[page].fillingQuestion;
-    int wrong = wrongWordsCount(answerSentence, modifiedSentence);
+    int wrong = wrongWordsPercent(answerSentence, modifiedSentence);
     state[page] = QuestionData(
         question: questionSentence,
         answer: answerSentence,
@@ -100,11 +98,11 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         modified: modifiedSentence,
         fillingQuestion: fillingQuestion,
         errors: []);
-        //TODO:errorsを追加する
+    //TODO:errorsを追加する
     //isAnsweredが変化してもbuild treeで反応しない→反応させる方法はあるか、別の方法（isAnsweredProviderをリストにする）or currentPageみたいなのをつけることでそこまでは一括で回答済みにする＋isAnsweredProvider戻れる必要性がない
   }
 
-  int wrongWordsCount(var answerSentence, var modifiedSentence) {
+  int wrongWordsPercent(var answerSentence, var modifiedSentence) {
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     int i = 0, j = 0, wrong = 0;
@@ -131,7 +129,8 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         }
       }
     }
-    return wrong;
+    var percent = (100 - (wrong / modifiedSentence.length * 100)).round();
+    return percent;
   }
 
   int _findNextMatch(

@@ -230,7 +230,7 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
 Answer:  $answeredSentence
 
 Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts, the suggested parts, and the reason as a form of an array. 
-Note: the suggested_phrase mut be in English, and the reason must be in Japanese.
+Note: the suggested_phrase must be in English, and the reason must be in Japanese.
 
 For example:  "error_array": [
     {

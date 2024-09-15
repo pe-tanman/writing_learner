@@ -1,41 +1,45 @@
-/*import 'package:flutter/material.dart';
-import 'package:writing_learner/screens/filling_question_page.dart';
-import 'package:writing_learner/screens/question_result_screen.dart';
-import 'package:writing_learner/screens/question_start_screen.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/utilities/generative_service.dart';
-import 'package:writing_learner/provider/question_provider.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
-import 'dart:math';
+import 'package:writing_learner/screens/question_page.dart';
+import 'package:writing_learner/screens/question_start_screen.dart';
+import 'package:writing_learner/screens/question_result_screen.dart';
 
+import 'package:flutter/services.dart' show rootBundle;
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/question_provider.dart';
+import 'package:fast_csv/fast_csv.dart' as fast_csv;
 import 'package:writing_learner/widgets/loading_indicator.dart';
+import 'package:writing_learner/provider/database_helper.dart';
 
-class FillingPatternQuestionView extends ConsumerStatefulWidget {
-  const FillingPatternQuestionView({super.key});
-  static const routeName = 'filling-pattern-question-view';
-
+class W2pQuestionView extends ConsumerStatefulWidget {
+  const W2pQuestionView({super.key});
+  static const routeName = 'w2p-question-view';
   @override
-  ConsumerState<FillingPatternQuestionView> createState() =>
-      FillingPatternQuestionViewState();
+  ConsumerState<W2pQuestionView> createState() => W2pQuestionViewState();
 }
 
-class FillingPatternQuestionViewState
-    extends ConsumerState<FillingPatternQuestionView> {
+class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
   var isInit = true;
   var isLoading = true;
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
-  int materialId = 5;
+  int materialId = 2;
   late PageController _pageController;
+  int startQuestionId = 0;
+
+  QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
+  MaterialDatabaseHelper materialDatabaseHelper = MaterialDatabaseHelper();
 
   List<Widget> availableQuestionPages = [];
 
   Future<void> initPages(WidgetRef ref) async {
     availableQuestionPages.add(const QuestionStartScreen());
-    await preloadNextPage(ref, 0);
+    startQuestionId = await getNextId();
+    print("startQuestionId$startQuestionId");
+    await preloadNextPage(ref, questionNum + 1);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;
     setState(() {
@@ -43,46 +47,25 @@ class FillingPatternQuestionViewState
     });
   }
 
-  Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
-    String levelStr = ModalRoute.of(context)!.settings.arguments as String;
-
-    final patternData = await extractPatternData();
-
-    Map fillQuestion =
-        await GenerativeService().generateFillingPatternQuestion(patternData);
-print(fillQuestion);
-    ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
-        question: fillQuestion['Japanese Sentence'],
-        answer: '',
-        wrongWordsCount: 0,
-        modified: fillQuestion['English Sentence'],
-        fillingQuestion: fillQuestion['Filling Question'],
-        errors: []));
-    availableQuestionPages.add(FillingQuestionPage(questionNum: nextQuestion));
-  }
-
-  Future<String> extractPatternData() async {
-    try {
-      // Load the JSON file
-      String jsonString =
-          await rootBundle.loadString('lib/assets/pattern_data.json');
-
-      // Parse the JSON string into a List of Strings
-      List<dynamic> jsonData = jsonDecode(jsonString);
-
-      // Extract the pattern data from the JSON
-      List<String> patternData =
-          jsonData.map((data) => data['pattern'] as String).toList();
-      print(patternData);
-      // Randomly select one pattern from patternData
-      final random = Random();
-      final selectedPattern = patternData[random.nextInt(patternData.length)];
-      print(selectedPattern);
-      return selectedPattern;
-    } catch (e) {
-      print('Error: $e');
-      return '';
+  Future<void> preloadNextPage(WidgetRef ref, int nextQuestionNum) async {
+    var questionMap = await dbHelper.getSelectedData(
+        materialId,
+        startQuestionId +
+            nextQuestionNum); //current Question id = nextQuestionId + nextQuestionNum
+    print("map$questionMap");
+    String questionSentence = '';
+    int questionNumInCurrentSession = nextQuestionNum-1 % 3;
+    if (questionMap.isEmpty) {
+      availableQuestionPages.add(QuestionResultScreen(materialId, startQuestionId+nextQuestionNum, nextQuestionNum-questionNumInCurrentSession, nextQuestionNum));
+      return;
+    } else {
+      questionSentence = questionMap[0]['question_sentence'];
     }
+
+    ref
+        .read(questionDataProvider.notifier)
+        .addQuestionSentence(questionSentence);
+    availableQuestionPages.add(QuestionPage(questionNum: nextQuestionNum));
   }
 
   var answerSentence = '';
@@ -90,6 +73,10 @@ print(fillQuestion);
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+  }
+
+  Future<int> getNextId() async {
+    return await materialDatabaseHelper.getNextNum(materialId);
   }
 
   @override
@@ -105,7 +92,6 @@ print(fillQuestion);
         body: isLoading
             ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
-              //スワイプを制限
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&
                       notification.metrics is PageMetrics) {
@@ -115,10 +101,12 @@ print(fillQuestion);
                         ref.watch(isAnsweredProvider)) {
                     } else if (metrics.page! < currentPage.toDouble()) {
                       _pageController.jumpToPage(currentPage);
+                      print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
                         !ref.watch(isAnsweredProvider)) {
                       _pageController.jumpToPage(currentPage);
+                      print('prohibited');
                       return true;
                     }
                   }
@@ -128,17 +116,24 @@ print(fillQuestion);
                   scrollDirection: Axis.horizontal,
                   controller: _pageController,
                   onPageChanged: (int page) async {
-                    if (page % 6 != 0) {
+                    if (page % 4 != 0) {
                       questionNum++;
                     }
 
-                    if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionResultScreen(5));
+                    if ((page + 1) % 4 == 0) {
+                      availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 2,
+                          questionNum));
+                          print('startQuestionNum${questionNum-2}');
+                          print('endQuestionNum$questionNum');
                     } else {
-                      await preloadNextPage(ref, questionNum + 1);
+                      await preloadNextPage(ref,
+                          questionNum + 1); 
                     }
 
-                    if ((page) % 6 == 0) {
+                    if ((page) % 4 == 0) {
                       ref.read(isAnsweredProvider.notifier).state = true;
                     } else {
                       ref.read(isAnsweredProvider.notifier).state = false;
@@ -151,4 +146,3 @@ print(fillQuestion);
               ));
   }
 }
-*/

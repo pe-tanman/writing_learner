@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class QuestionPage extends ConsumerStatefulWidget {
   const QuestionPage({super.key, required this.questionNum});
@@ -56,14 +58,15 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                     ref.read(isAnsweredProvider.notifier).state = true;
                     
                   },
-                  child: Text('答え合わせ')),
+                  child: const Text('答え合わせ')),
               Center(
                   child: showAnswer
                       ? Column(
                           children: [
                             ModifiedAnswerRichText(page: questionNum),
                             Text(
-                                '間違い :${questionData.wrongWordsCount.toString()}')
+                                '正答率 :${questionData.wrongWordsCount}%'),
+                                _getLinearGauge()                                
                           ],
                         )
                       : Container()),
@@ -71,6 +74,24 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
           ),
         ),
       ),
+    );
+  }
+    Widget _getLinearGauge() {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: SfLinearGauge(
+          minimum: 0.0,
+          maximum: 100.0,
+          orientation: LinearGaugeOrientation.horizontal,
+          showTicks: false,
+          showLabels: false,
+          animateAxis: true,
+          axisTrackStyle: LinearAxisTrackStyle(
+            
+              color: appTheme().primaryColor,
+              edgeStyle: LinearEdgeStyle.bothFlat,
+              thickness: 15.0,
+              borderColor: Colors.grey)),
     );
   }
 }

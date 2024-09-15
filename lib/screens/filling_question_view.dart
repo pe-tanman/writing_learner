@@ -23,6 +23,8 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
+  int materialId = 3;
+  int startQuestionId = 0;
   late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
@@ -40,11 +42,6 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
        Map fillQuestion =
         await GenerativeService().generateFillingQuestion();
-        print(fillQuestion);
-        print(fillQuestion['Japanese_sentence']);  
-        print(fillQuestion['English_sentence']);
-        print(fillQuestion['filling_question']);
-
         ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
           question: fillQuestion['Japanese_sentence'],
           answer: '',
@@ -105,7 +102,11 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionResultScreen());
+                     availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 3,
+                          questionNum));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

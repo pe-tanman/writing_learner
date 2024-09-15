@@ -9,7 +9,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:fast_csv/fast_csv.dart' as fast_csv;
-import 'package:writing_learner/themes/app_theme.dart';
 import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class ProverbQuestionView extends ConsumerStatefulWidget {
@@ -26,6 +25,8 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
+  int materialId = 4;
+  int startQuestionId = 0;
   late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
@@ -57,8 +58,8 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
         answer: '',
         modified: modifiedSentence,
         wrongWordsCount: 0,
-          errors: []);
-      
+        errors: []);
+
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
     availableQuestionPages.add(QuestionPage(questionNum: nextQuestion));
   }
@@ -81,7 +82,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
           actions: [],
         ),
         body: isLoading
-            ?  LoadingIndicator()
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&
@@ -92,12 +93,10 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                         ref.watch(isAnsweredProvider)) {
                     } else if (metrics.page! < currentPage.toDouble()) {
                       _pageController.jumpToPage(currentPage);
-                      print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
                         !ref.watch(isAnsweredProvider)) {
                       _pageController.jumpToPage(currentPage);
-                      print('prohibited');
                       return true;
                     }
                   }
@@ -112,7 +111,11 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionResultScreen());
+                      availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 3,
+                          questionNum));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

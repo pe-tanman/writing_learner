@@ -19,10 +19,7 @@ ThemeData appTheme() => ThemeData(
           fontFamily: 'hiragino',
           fontSize: 20,
         ),
-        
-
       ),
-
       snackBarTheme: const SnackBarThemeData(showCloseIcon: true),
       cardTheme: CardTheme(
         elevation: 0,

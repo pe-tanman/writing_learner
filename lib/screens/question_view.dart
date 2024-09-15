@@ -22,6 +22,8 @@ class QuestionViewState extends ConsumerState<QuestionView> {
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
+  int materialId = 0;
+  int startQuestionId = 0;//TODO:
   late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
@@ -38,8 +40,10 @@ class QuestionViewState extends ConsumerState<QuestionView> {
 
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
     String levelStr = ModalRoute.of(context)!.settings.arguments as String;
-    String questionSentence = await GenerativeService().generateTranslationQuestion(levelStr);
-        ref.read(questionDataProvider.notifier)
+    String questionSentence =
+        await GenerativeService().generateTranslationQuestion(levelStr);
+    ref
+        .read(questionDataProvider.notifier)
         .addQuestionSentence(questionSentence);
     availableQuestionPages.add(QuestionPage(
       questionNum: nextQuestion,
@@ -96,7 +100,11 @@ class QuestionViewState extends ConsumerState<QuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionResultScreen());
+                      availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 3,
+                          questionNum));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

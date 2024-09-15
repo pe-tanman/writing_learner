@@ -1,0 +1,91 @@
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "調理は、事実上、噛んで消化するという作業の一部を引き受け、外部のエネルギー源を用いて、われわれの身体の外部で、それを遂行してくれたのである。"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "首相から成長戦略の一環として求められた要請に、経団連（japan Business Feberation）が応じたためだ"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "長期間、就活に苦闘し、学業に専念できないのでは学力低下を招く懸念がある "
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "時期の見直しだけでは解決できない様々な課題が整理されずに残っている "
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "日本語作家になる前に、僕はアメリカで日本文学を研究していた。日本語ので感動をおぼえると、それを英語に翻訳することもあった "
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "写しながら驚くほど、抵抗もなく英語になった歌もあった。そしていくら努力してみても、英語の詩にはなかなかならない歌もあった "
+        }
+    ]
+}

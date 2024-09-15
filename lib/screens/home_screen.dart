@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
+import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
@@ -83,14 +84,18 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     _buildItem('AI最難関英訳', '和文英訳', 'lib/assets/blue.png',
                         QuestionView.routeName, context, ref, 'Tokyo'),
-                        _buildItem('AI難関英訳', '和文英訳', 'lib/assets/blue.png',
-                        QuestionView.routeName, context, ref, 'Nagoya'),
+                        _buildItem(
+                        'Write to the point',
+                        '英訳教材',
+                        'lib/assets/blue.png',
+                        W2pQuestionView.routeName,
+                        context,
+                        ref),
                     _buildItem('AI最難関穴埋め', '和文英訳', 'lib/assets/coming_square.png',
                         FillingQuestionView.routeName, context, ref, 'Tokyo'),
+                    
                     _buildItem('ことわざ', '表現', 'lib/assets/coming_square.png',
                         ProverbQuestionView.routeName, context, ref),
-                    _buildItem('構文150', '構文', 'lib/assets/coming_square.png',
-                        FillingPatternQuestionView.routeName, context, ref),
                   ],
                 ),
               ),
@@ -104,8 +109,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
       var context, WidgetRef ref,
       [String? levelStr]) {
     return SizedBox(
-      width: 150,
-      height: 200,
+      width: 180,
+      height: 240,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: InkWell(
@@ -124,13 +129,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 borderRadius: BorderRadius.circular(12),
                 color: AppColors.themeColor),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    height: 119,
+                    height: 144,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(imagePath),
