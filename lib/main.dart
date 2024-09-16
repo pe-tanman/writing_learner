@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/home_screen.dart';
 import 'package:writing_learner/screens/question_view.dart';
+import 'package:writing_learner/screens/review_question_view.dart';
 import 'package:writing_learner/themes/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
           FillingQuestionView.routeName: (ctx) => const FillingQuestionView(),
           ProverbQuestionView.routeName: (ctx) => const ProverbQuestionView(),
           W2pQuestionView.routeName: (ctx) => const W2pQuestionView(),
+          ReviewQuestionView.routeName: (ctx) => const ReviewQuestionView(),
           /*FillingPatternQuestionView.routeName: (ctx) => const FillingPatternQuestionView(),*/
         });
   }

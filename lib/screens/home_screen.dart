@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
+import 'package:writing_learner/screens/review_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
@@ -64,6 +65,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                     image: const DecorationImage(image:  AssetImage('lib/assets/coming_wide.png'), fit: BoxFit.fill),
                   ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: OutlinedButton(onPressed: (){
+                    Navigator.of(context).pushNamed(ReviewQuestionView.routeName);
+                    ref.watch(questionDataProvider.notifier).clearQuestions();
+                }, child: const Text('総復習')),
               ),
               const SizedBox(height: 20),
                Padding(

@@ -44,7 +44,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
         await GenerativeService().generateTranslationQuestion(levelStr);
     ref
         .read(questionDataProvider.notifier)
-        .addQuestionSentence(questionSentence);
+        .addQuestionSentence(materialId, questionSentence);
     availableQuestionPages.add(QuestionPage(
       questionNum: nextQuestion,
     ));

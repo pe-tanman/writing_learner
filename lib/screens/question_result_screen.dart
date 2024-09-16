@@ -6,7 +6,7 @@ import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/provider/database_helper.dart';
 
 class QuestionResultScreen extends ConsumerStatefulWidget {
-  final int materialId;
+  final int? materialId;
   final int startQuestionNum;
   final int endQuestionNum;
   final int startQuestionId;
@@ -22,6 +22,7 @@ class QuestionResultScreen extends ConsumerStatefulWidget {
 class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
   var pastQuestions = [];
   var questionData;
+  int materialId = 0;
   QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
   MaterialDatabaseHelper materialDbHelper = MaterialDatabaseHelper();
 
@@ -34,19 +35,23 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
     for (var questionNum = widget.startQuestionNum;
         questionNum <= widget.endQuestionNum;
         questionNum++) {
-      print("questionNum$questionNum");
       var data = questionData[questionNum];
       pastQuestions.add(data);
-
-      dbHelper.updateAccuracyRate(widget.materialId,
-          widget.startQuestionId + questionNum, data.wrongWordsCount);
+      if (widget.materialId != null) {
+        dbHelper.updateAccuracyRate(widget.materialId!,
+            widget.startQuestionId + questionNum, data.wrongWordsCount);
+      } else {
+        materialId = data.materialId;
+        dbHelper.updateAccuracyRate(
+            materialId, questionNum, data.wrongWordsCount);
+      }
     }
-    print("pastQuestions$pastQuestions");
-    print(
-        'nextQuestionId${widget.endQuestionNum + widget.startQuestionId + 1}');
-
-    materialDbHelper.updateNextNumber(widget.materialId,
-        (widget.endQuestionNum + widget.startQuestionId + 1));
+    if (widget.materialId != null) {
+      materialDbHelper.updateNextNumber(widget.materialId!,
+          (widget.endQuestionNum + widget.startQuestionId + 1));
+    } else {
+      materialDbHelper.updateNextNumber(materialId,( widget.endQuestionNum + widget.startQuestionId + 1));
+    }
 
     List<TableCell> countTableRow = pastQuestions.map((question) {
       return TableCell(
@@ -57,7 +62,7 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
       );
     }).toList();
     List<TableCell> numTableRow =
-        Iterable<int>.generate(3, (i) => i + 1).map((number) {
+        Iterable<int>.generate(widget.endQuestionNum-widget.startQuestionNum+1, (i) => i + 1).map((number) {
       return TableCell(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

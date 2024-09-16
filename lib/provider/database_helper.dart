@@ -77,6 +77,11 @@ class QuestionDatabaseHelper {
     return await db!.query('question_table');
   }
 
+  Future<List<Map<String, dynamic>>> getReviewData() async {
+    final Database? db = await database;
+    return await db!.query('question_table',  where: 'accuracy_rate IS NOT NULL', orderBy: 'accuracy_rate DESC');
+  }
+
   Future<void> insertData(
       materialId, questionNumber, questionSentence, int? accuracyRate) async {
     final Database? db = await database;

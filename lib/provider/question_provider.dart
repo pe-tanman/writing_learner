@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 class QuestionData {
   final String question;
+  final int materialId;
   final String answer;
   final String modified;
   final int wrongWordsCount;
@@ -12,6 +13,7 @@ class QuestionData {
   final List<GrammarError> errors;
 
   QuestionData({
+    required this.materialId,
     required this.question,
     required this.answer,
     required this.wrongWordsCount,
@@ -39,8 +41,9 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
   QuestionDataNotifier() : super([]);
 
   // 新しい質問を追加
-  void addQuestionSentence(String questionSentence) {
+  void addQuestionSentence(int materialId, String questionSentence) {
     QuestionData questionData = QuestionData(
+      materialId: materialId,
       question: questionSentence,
       answer: '',
       wrongWordsCount: 0,
@@ -78,6 +81,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
           original: original, suggestion: suggestion, reason: reason));
     }
     state[page] = QuestionData(
+        materialId: state[page].materialId,
         question: questionSentence,
         answer: answerSentence,
         wrongWordsCount: wrong,
@@ -90,8 +94,10 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     String questionSentence = state[page].question;
     String modifiedSentence = state[page].modified;
     String? fillingQuestion = state[page].fillingQuestion;
+    int materialId = state[page].materialId;
     int wrong = wrongWordsPercent(answerSentence, modifiedSentence);
     state[page] = QuestionData(
+        materialId: materialId,
         question: questionSentence,
         answer: answerSentence,
         wrongWordsCount: wrong,

@@ -43,6 +43,7 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
        Map fillQuestion =
         await GenerativeService().generateFillingQuestion();
         ref.read(questionDataProvider.notifier).addQuestionData(QuestionData(
+          materialId: materialId,
           question: fillQuestion['Japanese_sentence'],
           answer: '',
           wrongWordsCount: 0,

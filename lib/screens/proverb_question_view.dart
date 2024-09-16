@@ -54,6 +54,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
     String questionSentence = csvData[nextQuestion][0];
     String modifiedSentence = csvData[nextQuestion][1];
     QuestionData questionData = QuestionData(
+        materialId: materialId,
         question: questionSentence,
         answer: '',
         modified: modifiedSentence,

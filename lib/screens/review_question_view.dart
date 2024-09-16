@@ -1,71 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:path/path.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
+import 'package:writing_learner/screens/home_screen.dart';
 import 'package:writing_learner/screens/question_page.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:writing_learner/screens/question_result_screen.dart';
 
-import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
-import 'package:fast_csv/fast_csv.dart' as fast_csv;
+import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/widgets/loading_indicator.dart';
 import 'package:writing_learner/provider/database_helper.dart';
 
-class W2pQuestionView extends ConsumerStatefulWidget {
-  const W2pQuestionView({super.key});
-  static const routeName = 'w2p-question-view';
+class ReviewQuestionView extends ConsumerStatefulWidget {
+  const ReviewQuestionView({super.key});
+  static const routeName = 'review-question-view';
   @override
-  ConsumerState<W2pQuestionView> createState() => W2pQuestionViewState();
+  ConsumerState<ReviewQuestionView> createState() => ReviewQuestionViewState();
 }
 
-class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
+class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
   var isInit = true;
   var isLoading = true;
   var answered = false;
   int currentPage = 0;
-  int questionNum = -1;
-  int materialId = 2;
+  int questionNum = 0;
   late PageController _pageController;
-  int startQuestionId = 0;
 
   QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
   MaterialDatabaseHelper materialDatabaseHelper = MaterialDatabaseHelper();
 
   List<Widget> availableQuestionPages = [];
 
-  Future<void> initPages(WidgetRef ref) async {
+  Future<void> initPages(WidgetRef ref, BuildContext context) async {
+
     availableQuestionPages.add(const QuestionStartScreen());
-    startQuestionId = await getNextId();
-    print("startQuestionId$startQuestionId");
-    await preloadNextPage(ref, questionNum + 1);
+    await preloadNextPage(ref, questionNum, context);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;
+    print(ref.read(questionDataProvider));
     setState(() {
       isLoading = false;
     });
   }
 
-  Future<void> preloadNextPage(WidgetRef ref, int nextQuestionNum) async {
-    var questionMap = await dbHelper.getSelectedData(
-        materialId,
-        startQuestionId +
-            nextQuestionNum); //current Question id = nextQuestionId + nextQuestionNum
-    print("map$questionMap");
+  Future<void> preloadNextPage(
+      WidgetRef ref, int nextQuestionNum, BuildContext context) async {
+    var questionMaps = await dbHelper.getReviewData();
+    var questionMap = {};
+    print("map$questionMaps");
     String questionSentence = '';
-    int questionNumInCurrentSession = (nextQuestionNum-1) % 3;
-    
-    if (questionMap.isEmpty) {
-      availableQuestionPages.add(QuestionResultScreen(materialId, startQuestionId+nextQuestionNum, nextQuestionNum-questionNumInCurrentSession, nextQuestionNum));
+    int currentMaterialId = 0;
+    int questionNumInCurrentSession = nextQuestionNum % 3;
+    print('questionNumInCurrentSession$questionNumInCurrentSession');
+    if (questionMaps.length <= questionNum) {
+      if (questionMaps.length == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('復習する問題がありません'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+      availableQuestionPages.add(QuestionResultScreen(null, nextQuestionNum,
+          nextQuestionNum - questionNumInCurrentSession, nextQuestionNum));
       return;
     } else {
-      questionSentence = questionMap[0]['question_sentence'];
+      questionMap = questionMaps[questionNum];
+      questionSentence = questionMap['question_sentence'];
+      currentMaterialId = questionMap['material_id'];
+      print('currentMaterialId$currentMaterialId');
     }
 
     ref
         .read(questionDataProvider.notifier)
-        .addQuestionSentence(materialId, questionSentence);
+        .addQuestionSentence(currentMaterialId, questionSentence);
     availableQuestionPages.add(QuestionPage(questionNum: nextQuestionNum));
   }
 
@@ -76,14 +86,10 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
     _pageController = PageController(initialPage: 0);
   }
 
-  Future<int> getNextId() async {
-    return await materialDatabaseHelper.getNextNum(materialId);
-  }
-
   @override
   Widget build(BuildContext context) {
     if (isInit) {
-      initPages(ref);
+      initPages(ref, context);
     }
 
     return Scaffold(
@@ -123,15 +129,11 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
 
                     if ((page + 1) % 4 == 0) {
                       availableQuestionPages.add(QuestionResultScreen(
-                          materialId,
-                          startQuestionId,
-                          questionNum - 2,
-                          questionNum));
-                          print('startQuestionNum${questionNum-2}');
-                          print('endQuestionNum$questionNum');
+                          null, 0, questionNum - 2, questionNum));
+                      print('startQuestionNum${questionNum - 2}');
+                      print('endQuestionNum$questionNum');
                     } else {
-                      await preloadNextPage(ref,
-                          questionNum + 1); 
+                      await preloadNextPage(ref, questionNum + 1, context);
                     }
 
                     if ((page) % 4 == 0) {
