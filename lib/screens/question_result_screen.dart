@@ -10,8 +10,9 @@ class QuestionResultScreen extends ConsumerStatefulWidget {
   final int startQuestionNum;
   final int endQuestionNum;
   final int startQuestionId;
+  final bool isDailyChallenge;
   const QuestionResultScreen(this.materialId, this.startQuestionId,
-      this.startQuestionNum, this.endQuestionNum,
+      this.startQuestionNum, this.endQuestionNum, this.isDailyChallenge,
       {super.key});
 
   @override
@@ -37,13 +38,19 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
         questionNum++) {
       var data = questionData[questionNum];
       pastQuestions.add(data);
+      List<int> errorTags = [];
+      data.errors.forEach((element) {
+        errorTags.add(element.type);
+      });
+
       if (widget.materialId != null) {
-        dbHelper.updateAccuracyRate(widget.materialId!,
-            widget.startQuestionId + questionNum, data.wrongWordsCount);
+        
+        dbHelper.updateAccuracyRateAndError(widget.materialId!,
+            widget.startQuestionId + questionNum, data.wrongWordsCount, errorTags);
       } else {
         materialId = data.materialId;
-        dbHelper.updateAccuracyRate(
-            materialId, questionNum, data.wrongWordsCount);
+        dbHelper.updateAccuracyRateAndError(
+            materialId, questionNum, data.wrongWordsCount, errorTags );
       }
     }
     if (widget.materialId != null) {
@@ -108,7 +115,15 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
                   countTableRow,
             ),
           ],
-        )
+        ),
+        SizedBox(height: 30),
+        if(widget.isDailyChallenge)
+         ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.accentColor),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('ホームに戻る',style:TextStyle(color: Colors.white, fontSize: 22))),
       ]),
     ));
   }

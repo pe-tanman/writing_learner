@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:writing_learner/screens/daily_challenge.dart';
 import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/home_screen.dart';
 import 'package:writing_learner/screens/question_view.dart';
@@ -8,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
+import 'package:writing_learner/screens/review_list_screen.dart';
 
 void main() {
+  
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -30,6 +33,8 @@ class MyApp extends StatelessWidget {
           ProverbQuestionView.routeName: (ctx) => const ProverbQuestionView(),
           W2pQuestionView.routeName: (ctx) => const W2pQuestionView(),
           ReviewQuestionView.routeName: (ctx) => const ReviewQuestionView(),
+          ReviewListScreen.routeName: (ctx) =>  ReviewListScreen(),
+          DailyChallengeScreen.routeName: (ctx) => const DailyChallengeScreen(),
           /*FillingPatternQuestionView.routeName: (ctx) => const FillingPatternQuestionView(),*/
         });
   }

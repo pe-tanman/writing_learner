@@ -116,7 +116,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                           materialId,
                           startQuestionId,
                           questionNum - 3,
-                          questionNum));
+                          questionNum, false));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

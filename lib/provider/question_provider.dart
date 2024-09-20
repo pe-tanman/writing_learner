@@ -27,13 +27,25 @@ class QuestionData {
 class GrammarError {
   final String original;
   final String suggestion;
-  final String reason;
+  final int type;
+  final String detailedReason;
 
   GrammarError({
     required this.original,
     required this.suggestion,
-    required this.reason,
+    required this.type,
+    required this.detailedReason,
   });
+
+  static String toErrorType(int tag) {
+    var errorTags = [
+      'スペルミス',
+      '複数形のミス',
+      '三単現のミス',
+      '完了形の使用ミス',
+      '不定詞の使用ミス', '前置詞の使用ミス', '冠詞の使用ミス', '代名詞の使用ミス', '時制のミス', 'ニュアンスについて不自然な表現', 'あまり使われない不自然な表現', '記号の使い方のミス', '名詞のミス', 'その他のミス'];
+      return errorTags[tag];
+  }
 }
 
 @riverpod
@@ -76,9 +88,10 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
       var error = errorMap[i];
       var original = error['original_phrase'];
       var suggestion = error['suggested_phrase'];
+      var type = error['type'];
       var reason = error['reason'];
       errors.add(GrammarError(
-          original: original, suggestion: suggestion, reason: reason));
+          original: original, suggestion: suggestion, type:type, detailedReason: reason));
     }
     state[page] = QuestionData(
         materialId: state[page].materialId,
@@ -109,17 +122,21 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
   }
 
   int wrongWordsPercent(var answerSentence, var modifiedSentence) {
+    print(answerSentence);
+    print(modifiedSentence);
     List<String> words1 = answerSentence.split(' ');
     List<String> words2 = modifiedSentence.split(' ');
     int i = 0, j = 0, wrong = 0;
     while (i < words1.length || j < words2.length) {
+      print('i:$i, j:$j');
+      print('wrong:$wrong');
       if (i < words1.length && j < words2.length && words1[i] == words2[j]) {
         i++;
         j++;
       } else {
         // Find the next matching word
         int nextMatch = _findNextMatch(words1, words2, i, j);
-
+print('nextMatch:$nextMatch');
         if (nextMatch == -1) {
           while (j < words2.length) {
             wrong++;
@@ -127,7 +144,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
           }
           break;
         } else {
-          while (j < nextMatch) {
+          while (j <= nextMatch) {
             wrong++;
             j++;
           }
@@ -135,7 +152,9 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         }
       }
     }
-    var percent = (100 - (wrong / modifiedSentence.length * 100)).round();
+    print('wrong:$wrong');
+    print('modifiedSentence.length:${words2.length}');
+    var percent = (100 - (wrong / words2.length) * 100).round();
     return percent;
   }
 

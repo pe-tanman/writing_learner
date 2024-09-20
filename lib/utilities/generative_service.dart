@@ -229,19 +229,38 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Question: $questionSentence
 Answer:  $answeredSentence
 
-Task: Modify the answer to be appropriate as a translation of the Question. Then list the original parts, the suggested parts, and the reason as a form of an array. 
-Note: the suggested_phrase must be in English, and the reason must be in Japanese.
+Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified.
+List these: 1. the original parts in Japanese 2. the suggested parts in English  3. the reason type number selected from {
+  0: 'スペルミス',
+  1: '複数形のミス',
+  2: '三単現のミス',
+  3: '完了形の使用ミス',
+  4: '不定詞の使用ミス',
+  5: '前置詞の使用ミス',
+  6: '冠詞の使用ミス',
+  7: '代名詞の使用ミス',
+  8: '時制のミス',
+  9: 'ニュアンスについて不自然な表現',
+  10: 'あまり使われない不自然な表現',
+  11: '記号の使い方のミス',
+  12: '名詞のミス',
+  13: 'その他のミス'
+}
+4. detailed error reason in Japanese.
+
 
 For example:  "error_array": [
     {
       "original_phrase": "is",
       "suggested_phrase": "has",
-      "reason": "現在完了形の方が文脈に即す。"
+      "type": 3, 
+      "reason": "「まだ」というニュアンスを示すため現在完了形を使う"
     },
  {
       "original_phrase": "",
       "suggested_phrase": "for",
-      "reason": "for breakfastが正しい表現"
+      "type": 5,
+      "reason": ""for breakfast"が正しい表現"
     }
   ],
   "modified_sentence": "He has not decided what to eat for breakfast yet."  """;
@@ -278,13 +297,23 @@ For example:  "error_array": [
                   "description":
                       "A suggested English word or phrase to replace the original."
                 },
+                "type": {
+                  "type": "integer",
+                  "description":
+                      "The type of error. 0: 'スペルミス', 1: '複数形のミス', 2: '三単現のミス', 3: '完了形の使用ミス', 4: '不定詞の使用ミス', 5: '前置詞の使用ミス', 6: '冠詞の使用ミス', 7: '代名詞の使用ミス', 8: '時制のミス', 9: 'ニュアンスについて不自然な表現', 10: 'あまり使われない不自然な表現', 11: '記号の使い方のミス', 12: '名詞のミス', 13: 'その他のミス'"
+                },
                 "reason": {
                   "type": "string",
                   "description":
                       "The reason for the suggested replacement in Japanese."
                 }
               },
-              "required": ["original_phrase", "suggested_phrase", "reason"],
+              "required": [
+                "original_phrase",
+                "suggested_phrase",
+                "type",
+                "reason"
+              ],
               "additionalProperties": false
             }
           },

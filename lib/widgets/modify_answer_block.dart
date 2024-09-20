@@ -64,7 +64,8 @@ class ModifiedAnswerRichTextState
                     onTap: () {},
                     child: SuggestionCard(
                       suggestion: error.suggestion,
-                      reason: error.reason,
+                      errorTag: GrammarError.toErrorType(error.type),
+                      reason: error.detailedReason,
                       onApply: () {
                         _overlayEntry?.remove();
                       },

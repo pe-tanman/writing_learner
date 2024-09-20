@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:fast_csv/fast_csv.dart' as fast_csv;
+import 'dart:math' as math;
 
 class QuestionDatabaseHelper {
   static final QuestionDatabaseHelper _instance =
@@ -20,7 +21,7 @@ class QuestionDatabaseHelper {
       return _database;
     }
     _database = await initDatabase();
-    await setAllQuestions();
+    
     return _database;
   }
 
@@ -40,6 +41,7 @@ class QuestionDatabaseHelper {
             primary key(material_id, question_number)
           )
         ''');
+        await setAllQuestions();
       },
     );
     return db;
@@ -55,7 +57,7 @@ class QuestionDatabaseHelper {
   Future<void> setQuestion(materialId, csvPath) async {
     List<List<String>> csvData = await loadCSVFromAssets(csvPath);
     for (int i = 0; i < csvData.length; i++) {
-      insertData(materialId, i, csvData[i][0], null);
+      insertData(materialId, i, csvData[i][0], null, null);
     }
   }
 
@@ -79,27 +81,48 @@ class QuestionDatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getReviewData() async {
     final Database? db = await database;
-    return await db!.query('question_table',  where: 'accuracy_rate IS NOT NULL', orderBy: 'accuracy_rate DESC');
+    return await db!.query('question_table',  where: 'accuracy_rate IS NOT NULL', orderBy: 'accuracy_rate ASC');
+  }
+  Future<List<Map<String, dynamic>>> getQuestionData(materialId) async {
+    final Database? db = await database;
+    return await db!.query('question_table',
+        where: 'material_id = ? ', whereArgs: [materialId]);
+  }
+
+  Future<List<Map<String, dynamic>>> getRandomData() async {
+    final Database? db = await database;
+    var random = math.Random();
+    MaterialDatabaseHelper materialDatabaseHelper = MaterialDatabaseHelper();
+    var materialMaps = await materialDatabaseHelper.getAllData();
+    var materialId = random.nextInt(materialMaps.length - 1);
+    var questionId = materialMaps[materialId]['next_number'];
+    materialDatabaseHelper.updateNextNumber(materialId, questionId + 1);
+    return await db!.query('question_table', where: 'material_id = ? and question_number = ?', whereArgs: [materialId, questionId]);
   }
 
   Future<void> insertData(
-      materialId, questionNumber, questionSentence, int? accuracyRate) async {
+      materialId, questionNumber, questionSentence, int? accuracyRate, List<int>? tags) async {
+
     final Database? db = await database;
+    tags ??= [];
+    var tag_string = tags.join(',');
     Map<String, dynamic> data = {
       'material_id': materialId,
       'question_number': questionNumber,
       'question_sentence': questionSentence,
       'accuracy_rate': accuracyRate,
+      'error_tag': tag_string,
     };
     await db!.insert('question_table', data,
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> updateAccuracyRate(
-      int materialId, int questionNumber, int accuracyRate) async {
+  Future<void> updateAccuracyRateAndError(
+      int materialId, int questionNumber, int accuracyRate, List<int> errorTags) async {
     final Database? db = await database;
     Map<String, dynamic> data = {
       'accuracy_rate': accuracyRate,
+      'error_tag': errorTags.join(','),
     };
     await db!.update('question_table', data,
         where: 'material_id = ? and question_number = ?',
@@ -128,7 +151,7 @@ class MaterialDatabaseHelper {
       return _database;
     }
     _database = await initDatabase();
-    await setMaterial();
+    
     return _database;
   }
 
@@ -145,6 +168,7 @@ class MaterialDatabaseHelper {
            next_number INTEGER
           )
         ''');
+        await setMaterial();
       },
     );
   }
@@ -162,6 +186,7 @@ class MaterialDatabaseHelper {
     final Database? db = await database;
     return await db!.query('material_table');
   }
+  
 
   Future<int> getNextNum(materialId) async {
     final Database? db = await database;

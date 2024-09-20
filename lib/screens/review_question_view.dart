@@ -64,7 +64,7 @@ class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
         Navigator.of(context).pop();
       }
       availableQuestionPages.add(QuestionResultScreen(null, nextQuestionNum,
-          nextQuestionNum - questionNumInCurrentSession, nextQuestionNum));
+          nextQuestionNum - questionNumInCurrentSession, nextQuestionNum, false));
       return;
     } else {
       questionMap = questionMaps[questionNum];
@@ -129,11 +129,9 @@ class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
 
                     if ((page + 1) % 4 == 0) {
                       availableQuestionPages.add(QuestionResultScreen(
-                          null, 0, questionNum - 2, questionNum));
-                      print('startQuestionNum${questionNum - 2}');
-                      print('endQuestionNum$questionNum');
+                          null, 0, questionNum - 2, questionNum, false));
                     } else {
-                      await preloadNextPage(ref, questionNum + 1, context);
+                      await preloadNextPage(ref, questionNum, context);
                     }
 
                     if ((page) % 4 == 0) {

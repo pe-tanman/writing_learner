@@ -1,71 +1,80 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:path/path.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
+import 'package:writing_learner/screens/home_screen.dart';
 import 'package:writing_learner/screens/question_page.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:writing_learner/screens/question_result_screen.dart';
 
-import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
-import 'package:fast_csv/fast_csv.dart' as fast_csv;
 import 'package:writing_learner/widgets/loading_indicator.dart';
 import 'package:writing_learner/provider/database_helper.dart';
+import 'dart:math' as math;
 
-class W2pQuestionView extends ConsumerStatefulWidget {
-  const W2pQuestionView({super.key});
-  static const routeName = 'w2p-question-view';
+class DailyChallengeScreen extends ConsumerStatefulWidget {
+  const DailyChallengeScreen({super.key});
+  static const routeName = 'daily-challenge';
   @override
-  ConsumerState<W2pQuestionView> createState() => W2pQuestionViewState();
+  ConsumerState<DailyChallengeScreen> createState() =>
+      DailyChallengeScreenState();
 }
 
-class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
+class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
   var isInit = true;
   var isLoading = true;
   var answered = false;
   int currentPage = 0;
-  int questionNum = -1;
-  int materialId = 2;
+  int questionNum = 0;
   late PageController _pageController;
-  int startQuestionId = 0;
 
   QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
   MaterialDatabaseHelper materialDatabaseHelper = MaterialDatabaseHelper();
 
   List<Widget> availableQuestionPages = [];
 
-  Future<void> initPages(WidgetRef ref) async {
+  Future<void> initPages(WidgetRef ref, BuildContext context) async {
     availableQuestionPages.add(const QuestionStartScreen());
-    startQuestionId = await getNextId();
-    print("startQuestionId$startQuestionId");
-    await preloadNextPage(ref, questionNum + 1);
+    await preloadNextPage(ref, questionNum, context);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;
+    print(ref.read(questionDataProvider));
     setState(() {
       isLoading = false;
     });
   }
 
-  Future<void> preloadNextPage(WidgetRef ref, int nextQuestionNum) async {
-    var questionMap = await dbHelper.getSelectedData(
-        materialId,
-        startQuestionId +
-            nextQuestionNum); //current Question id = nextQuestionId + nextQuestionNum
-    print("map$questionMap");
+  Future<void> preloadNextPage(
+      WidgetRef ref, int nextQuestionNum, BuildContext context) async {
+    var questionMaps = await dbHelper.getReviewData();
+    var materialMaps = await materialDatabaseHelper.getAllData();
+    var questionMap = {};
     String questionSentence = '';
-    int questionNumInCurrentSession = (nextQuestionNum-1) % 3;
-    
-    if (questionMap.isEmpty) {
-      availableQuestionPages.add(QuestionResultScreen(materialId, startQuestionId+nextQuestionNum, nextQuestionNum-questionNumInCurrentSession, nextQuestionNum, false));
+    int currentMaterialId = 0;
+    int questionNumInCurrentSession = nextQuestionNum % 3;
+    if (questionMaps.length <= questionNum) {
+      if (questionMaps.length == 0) {
+        questionMap = questionMaps[questionNum];
+        var random = math.Random();
+        currentMaterialId = random.nextInt(materialMaps.length - 1);
+        var randomQuestions = await dbHelper.getRandomData();
+        questionSentence = randomQuestions[0]['question_sentence'];
+      }
+      availableQuestionPages.add(QuestionResultScreen(null, nextQuestionNum,
+          nextQuestionNum - questionNumInCurrentSession, nextQuestionNum, true));
       return;
     } else {
-      questionSentence = questionMap[0]['question_sentence'];
+      questionMap = questionMaps[questionNum];
+      questionSentence = questionMap['question_sentence'];
+      currentMaterialId = questionMap['material_id'];
     }
 
     ref
         .read(questionDataProvider.notifier)
-        .addQuestionSentence(materialId, questionSentence);
+        .addQuestionSentence(currentMaterialId, questionSentence);
+        print('nextQuestionNum$nextQuestionNum');
     availableQuestionPages.add(QuestionPage(questionNum: nextQuestionNum));
   }
 
@@ -76,14 +85,10 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
     _pageController = PageController(initialPage: 0);
   }
 
-  Future<int> getNextId() async {
-    return await materialDatabaseHelper.getNextNum(materialId);
-  }
-
   @override
   Widget build(BuildContext context) {
     if (isInit) {
-      initPages(ref);
+      initPages(ref, context);
     }
 
     return Scaffold(
@@ -94,7 +99,7 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
             ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
-                  if (notification is ScrollUpdateNotification &&
+                 if (notification is ScrollUpdateNotification &&
                       notification.metrics is PageMetrics) {
                     PageMetrics metrics = notification.metrics as PageMetrics;
                     int nextPage = metrics.page!.round();
@@ -105,7 +110,7 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
                       print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
-                        !ref.watch(isAnsweredProvider)) {
+                        !ref.watch(isAnsweredProvider)|| currentPage == 4) {
                       _pageController.jumpToPage(currentPage);
                       print('prohibited');
                       return true;
@@ -116,22 +121,16 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
                 child: PageView(
                   scrollDirection: Axis.horizontal,
                   controller: _pageController,
-                  onPageChanged: (int page) async {
+                   onPageChanged: (int page) async {
                     if (page % 4 != 0) {
                       questionNum++;
                     }
 
                     if ((page + 1) % 4 == 0) {
                       availableQuestionPages.add(QuestionResultScreen(
-                          materialId,
-                          startQuestionId,
-                          questionNum - 2,
-                          questionNum, false));
-                          print('startQuestionNum${questionNum-2}');
-                          print('endQuestionNum$questionNum');
+                          null, 0, questionNum - 2, questionNum, true));
                     } else {
-                      await preloadNextPage(ref,
-                          questionNum + 1); 
+                      await preloadNextPage(ref, questionNum, context);
                     }
 
                     if ((page) % 4 == 0) {

@@ -53,6 +53,7 @@ dependencies:
   syncfusion_flutter_gauges: ^26.2.14
   sqflite: ^2.3.3+1
   path: ^1.9.0
+  shared_preferences: ^2.3.2
   
 
 dev_dependencies:
