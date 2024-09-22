@@ -8,10 +8,10 @@ import 'package:flutter/gestures.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:writing_learner/widgets/suggestion_card.dart';
-
+import 'package:writing_learner/provider/emoji_converter.dart';
 class ModifiedAnswerRichText extends ConsumerStatefulWidget {
   final int page;
-  ModifiedAnswerRichText({super.key, required this.page});
+  const ModifiedAnswerRichText({super.key, required this.page});
 
   @override
   ConsumerState<ModifiedAnswerRichText> createState() =>
@@ -34,7 +34,7 @@ class ModifiedAnswerRichTextState
       _overlayEntry!.remove();
     }
     _overlayEntry = _createOverlayEntry(error);
-    Overlay.of(context)?.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
 //理由を表示するカード
@@ -246,6 +246,10 @@ class ModifiedAnswerRichTextState
                   children: modifiedSpans(questionData.answer, questionData.modified)
                 ),
               ),
+              SizedBox(height: 20),
+              Text(EmojiConverter.convertAccuracyToEmoji(
+                  questionData.wrongWordsCount), style: TextStyle(fontSize: 40
+                  ),)
             ],
           );
   }

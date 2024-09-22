@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter/material.dart';
 
 class QuestionData {
   final String question;
@@ -83,7 +84,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         .generateReasonMaps(questionSentence, answerSentence);
     var errorMap = output['error_array'];
     var modifiedSentence = output['modified_sentence'];
-    int wrong = wrongWordsPercent(answerSentence, modifiedSentence);
+    int wrong = countDifferentPercent(answerSentence, modifiedSentence);
     for (int i = 0; i <= errorMap.length - 1; i++) {
       var error = errorMap[i];
       var original = error['original_phrase'];
@@ -108,7 +109,7 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
     String modifiedSentence = state[page].modified;
     String? fillingQuestion = state[page].fillingQuestion;
     int materialId = state[page].materialId;
-    int wrong = wrongWordsPercent(answerSentence, modifiedSentence);
+    int wrong = countDifferentPercent(answerSentence, modifiedSentence);
     state[page] = QuestionData(
         materialId: materialId,
         question: questionSentence,
@@ -135,15 +136,16 @@ class QuestionDataNotifier extends StateNotifier<List<QuestionData>> {
         j++;
       } else {
         // Find the next matching word
-        int nextMatch = _findNextMatch(words1, words2, i, j);
-print('nextMatch:$nextMatch');
-        if (nextMatch == -1) {
+        int nextMatch1 = _findNextMatch(words1, words2, i, j);
+        int nextMatch2 = _findNextMatch(words2, words1, j, i);
+        if (nextMatch1 == -1&&nextMatch2==-1) {
           while (j < words2.length) {
             wrong++;
             j++;
           }
           break;
         } else {
+          int nextMatch = nextMatch1 < nextMatch2 ? nextMatch1 : nextMatch2;
           while (j <= nextMatch) {
             wrong++;
             j++;
@@ -167,6 +169,25 @@ print('nextMatch:$nextMatch');
     }
     return -1;
   }
+}
+
+  
+  int countDifferentPercent(String sentence1, String sentence2) {
+  int differentWordCount = 0;
+
+    String sentence1_low = sentence1.toLowerCase();
+    String sentence2_low = sentence2.toLowerCase();
+
+    Set<String> words1 = sentence1_low.split(RegExp(r'\W+'))
+        .where((word) => word.isNotEmpty).toSet();
+    Set<String> words2 = sentence2_low.split(RegExp(r'\W+'))
+        .where((word) => word.isNotEmpty).toSet();
+
+    Set<String> differentWords = words1.difference(words2).union(words2.difference(words1));
+    print('differentWords:$differentWords');
+    differentWordCount = differentWords.length;
+     var percent = (100 - (differentWordCount / words2.length) * 100).round();
+    return percent;
 }
 
 final questionDataProvider =

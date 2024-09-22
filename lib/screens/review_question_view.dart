@@ -54,9 +54,9 @@ class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
     int questionNumInCurrentSession = nextQuestionNum % 3;
     print('questionNumInCurrentSession$questionNumInCurrentSession');
     if (questionMaps.length <= questionNum) {
-      if (questionMaps.length == 0) {
+      if (questionMaps.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('復習する問題がありません'),
             duration: Duration(seconds: 2),
           ),
@@ -94,7 +94,7 @@ class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
             ? LoadingIndicator()

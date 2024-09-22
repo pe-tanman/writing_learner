@@ -105,13 +105,13 @@ class QuestionDatabaseHelper {
 
     final Database? db = await database;
     tags ??= [];
-    var tag_string = tags.join(',');
+    var tagString = tags.join(',');
     Map<String, dynamic> data = {
       'material_id': materialId,
       'question_number': questionNumber,
       'question_sentence': questionSentence,
       'accuracy_rate': accuracyRate,
-      'error_tag': tag_string,
+      'error_tag': tagString,
     };
     await db!.insert('question_table', data,
         conflictAlgorithm: ConflictAlgorithm.replace);

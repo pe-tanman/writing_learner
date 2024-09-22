@@ -27,7 +27,7 @@ class FillingQuestionPageState extends ConsumerState<FillingQuestionPage> {
 
     for (var i = 0; i < questionWords.length; i++) {
       if (questionWords[i].contains('___')) {
-        _controllers!.add(TextEditingController());
+        _controllers.add(TextEditingController());
         spans.add(WidgetSpan(
             child: SizedBox(
                 width: 80,
@@ -97,7 +97,7 @@ class FillingQuestionPageState extends ConsumerState<FillingQuestionPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('${questionData.question}'),
+              Text(questionData.question),
               const SizedBox(height: 15),
               RichText(
                 text: TextSpan(

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/daily_challenge.dart';
-import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
-import 'package:writing_learner/screens/review_list_screen.dart';
-import 'package:writing_learner/screens/review_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
@@ -31,12 +28,6 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: SizedBox(height:70, child:  Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Image.asset('lib/assets/wridge.png'),
-          )),
-        ),
         body: Padding(
           padding: const EdgeInsets.all(12.0),
           child: SingleChildScrollView(
@@ -84,13 +75,6 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: OutlinedButton(onPressed: (){
-                    Navigator.of(context).pushNamed(ReviewListScreen.routeName);
-                    ref.watch(questionDataProvider.notifier).clearQuestions();
-                }, child: const Text('総復習')),
-              ),
               const SizedBox(height: 20),
                Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -129,6 +113,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           ),
                 ),
         ),
+    
     );
   }
   Widget _buildItem(String title, String discription, var imagePath, var route,

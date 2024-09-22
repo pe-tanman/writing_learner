@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:writing_learner/screens/constact_screen.dart';
 import 'package:writing_learner/screens/daily_challenge.dart';
-import 'package:writing_learner/screens/filling_pattern_question_view.dart';
 import 'package:writing_learner/screens/home_screen.dart';
+import 'package:writing_learner/screens/main_screen.dart';
+import 'package:writing_learner/screens/privacy_policy.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/review_question_view.dart';
 import 'package:writing_learner/themes/app_theme.dart';
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Writing learner',
         theme: appTheme(),
-        home: const HomeScreen(),
+        home: const MainScreen(),
         routes: {
           HomeScreen.routeName: (ctx) => const HomeScreen(),
           QuestionView.routeName: (ctx) =>  const QuestionView(),
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
           ReviewQuestionView.routeName: (ctx) => const ReviewQuestionView(),
           ReviewListScreen.routeName: (ctx) =>  ReviewListScreen(),
           DailyChallengeScreen.routeName: (ctx) => const DailyChallengeScreen(),
+          MainScreen.routeName: (ctx) => const MainScreen(),
+          ContactScreen.routeName: (ctx) => const ContactScreen(),
+          PolicyScreen.routeName: (ctx) => const PolicyScreen(),
           /*FillingPatternQuestionView.routeName: (ctx) => const FillingPatternQuestionView(),*/
         });
   }

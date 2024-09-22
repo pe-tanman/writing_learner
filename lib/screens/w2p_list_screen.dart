@@ -6,6 +6,8 @@ import 'package:writing_learner/themes/app_color.dart';
 
 class QuestionListScreen extends StatefulWidget {
   static const routeName = 'question-list-screen';
+
+  const QuestionListScreen({super.key});
   @override
   _QuestionListScreenState createState() => _QuestionListScreenState();
 }
@@ -27,13 +29,13 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
       });
       return;
     }
-    questionMaps.forEach((element) {
+    for (var element in questionMaps) {
       result.add({
         'sentence': element['question_sentence'],
         'accuracy_rate': element['accuracy_rate'].toString(),
         'error_tag': 'error_types_str',
       });
-    });
+    }
     questionList = result;
     setState(() {
       isLoading = false;
@@ -52,9 +54,9 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
       appBar: AppBar(),
       body: Center(
         child: isLoading
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : (questionList.isEmpty)
-                ? Center(child: Text('復習する問題がありません'))
+                ? const Center(child: Text('復習する問題がありません'))
                 : Column(
                     children: [
                       ElevatedButton(
@@ -62,9 +64,9 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                               backgroundColor: AppColors.themeColor),
                           onPressed: () => Navigator.of(context)
                               .pushNamed(ReviewQuestionView.routeName),
-                          child: SizedBox(
+                          child: const SizedBox(
                               child: Padding(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 vertical: 13, horizontal: 60),
                             child: Text(
                               '復習を始める',
@@ -72,13 +74,13 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ))),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Expanded(
                         child: ListView.separated(
                           itemCount: questionList.length,
-                          separatorBuilder: (context, index) => Divider(
+                          separatorBuilder: (context, index) => const Divider(
                             color: Colors.grey,
                           ),
                           itemBuilder: (context, index) {
@@ -92,7 +94,7 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
                                           '${questionList[index]['accuracy_rate']}%',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16)),
                                     )),
@@ -100,10 +102,10 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(questionList[index]['sentence']!),
-                                    SizedBox(height: 10),
+                                    const SizedBox(height: 10),
                                     Text(
                                         '#${questionList[index]['error_tag']!}',
-                                        style: TextStyle(color: Colors.grey)),
+                                        style: const TextStyle(color: Colors.grey)),
                                   ],
                                 ),
                               ),

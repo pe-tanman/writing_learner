@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/provider/database_helper.dart';
@@ -26,6 +27,14 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
   int materialId = 0;
   QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
   MaterialDatabaseHelper materialDbHelper = MaterialDatabaseHelper();
+  
+  int averageAccuracy() {
+    var sum = 0;
+    for (QuestionData question in pastQuestions) {
+      sum += question.wrongWordsCount;
+    }
+    return (sum ~/ pastQuestions.length).round();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +48,9 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
       var data = questionData[questionNum];
       pastQuestions.add(data);
       List<int> errorTags = [];
-      data.errors.forEach((element) {
+      for (var element in data.errors) {
         errorTags.add(element.type);
-      });
+      }
 
       if (widget.materialId != null) {
         
@@ -64,7 +73,7 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
       return TableCell(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(question.wrongWordsCount.toString())),
+          child: Center(child: Text(EmojiConverter.convertAccuracyToEmoji(question.wrongWordsCount), style: TextStyle(fontSize: 30),)),
         ),
       );
     }).toList();
@@ -77,12 +86,18 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
         ),
       );
     }).toList();
+    
 
     return Scaffold(
         body: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Image.asset('lib/assets/l01_rectangle.png'),
+        widget.isDailyChallenge? EmojiConverter.convertAccuracyToPassFail(averageAccuracy()) :EmojiConverter.convertAccuracyToImage(averageAccuracy()),
+        const SizedBox(height: 20),
+        Divider(
+          color: AppColors.accentColor,
+          thickness: 2,
+        ),
         const SizedBox(height: 20),
         Table(
           border: const TableBorder(
@@ -116,7 +131,7 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
             ),
           ],
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         if(widget.isDailyChallenge)
          ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.accentColor),

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert' as convert;
+import 'package:vector_math/vector_math.dart';
+
 
 import 'package:http/http.dart' as http;
 
@@ -153,8 +155,8 @@ class GenerativeService {
   """;
 
     final output = await generateText(prompt, true, 0.5, jsonScheme);
-    var output_Map = convert.jsonDecode(output)['filling_question'];
-    return output_Map;
+    var outputMap = convert.jsonDecode(output)['filling_question'];
+    return outputMap;
   }
 
   Future<Map<String, dynamic>> generateFillingPatternQuestion(
@@ -229,7 +231,7 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Question: $questionSentence
 Answer:  $answeredSentence
 
-Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified.
+Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified. You must follow the correct expressions in the answer.
 List these: 1. the original parts in Japanese 2. the suggested parts in English  3. the reason type number selected from {
   0: 'スペルミス',
   1: '複数形のミス',

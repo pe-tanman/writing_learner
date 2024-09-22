@@ -234,10 +234,10 @@ packages:
     dependency: transitive
     description:
       name: custom_lint_core
-      sha256: a85e8f78f4c52f6c63cdaf8c872eb573db0231dcdf3c3a5906d493c1f8bc20e6
+      sha256: "4ddbbdaa774265de44c97054dcec058a83d9081d071785ece601e348c18c267d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.3"
+    version: "0.6.5"
   dart_openai:
     dependency: "direct main"
     description:
@@ -250,10 +250,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "99e066ce75c89d6b29903d788a7bb9369cf754f7b24bf70bf4b6d6d6b26853b9"
+      sha256: "7856d364b589d1f08986e140938578ed36ed948581fbc3bc9aef1805039ac5ab"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.6"
+    version: "2.3.7"
   dio:
     dependency: transitive
     description:
@@ -417,10 +417,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_generative_ai
-      sha256: e2f4c0ac13f0898f670ce5ac0dc4501ebe09b96f9d59163724380d9aa82065be
+      sha256: "81dae159c89e4d9bdc46955b6f4ee5ae0a291f9e8f990d76f43944e0d6041d4f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.4"
+    version: "0.4.6"
   google_translate:
     dependency: "direct main"
     description:
@@ -641,10 +641,10 @@ packages:
     dependency: transitive
     description:
       name: mime
-      sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
+      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   package_config:
     dependency: transitive
     description:
@@ -777,10 +777,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod_analyzer_utils
-      sha256: ee72770090078e6841d51355292335f1bc254907c6694283389dcb8156d99a4d
+      sha256: ac28d7bc678471ec986b42d88e5a0893513382ff7542c7ac9634463b044ac72c
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.3"
+    version: "0.5.4"
   riverpod_annotation:
     dependency: "direct main"
     description:
@@ -793,10 +793,10 @@ packages:
     dependency: "direct dev"
     description:
       name: riverpod_generator
-      sha256: "1ad626afbd8b01d168870b13c0b036f8a5bdb57c14cd426dc5b4595466bd6e2f"
+      sha256: "63311e361ffc578d655dfc31b48dfa4ed3bc76fd06f9be845e9bf97c5c11a429"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.2"
+    version: "2.4.3"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -902,10 +902,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "7b41b6c3507854a159e24ae90a8e3e9cc01eb26a477c118d6dca065b5f55453e"
+      sha256: "4058172e418eb7e7f2058dcb7657d451a8fc264afa0dea4dbd0f304a57131611"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4+2"
+    version: "2.5.4+3"
   stack_trace:
     dependency: transitive
     description:
@@ -966,10 +966,10 @@ packages:
     dependency: transitive
     description:
       name: synchronized
-      sha256: a824e842b8a054f91a728b783c177c1e4731f6b124f9192468457a8913371255
+      sha256: "51b08572b9f091f8c3eb4d9d4be253f196ff0075d5ec9b10a884026d5b55d7bc"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.3.0+2"
   term_glyph:
     dependency: transitive
     description:
@@ -1066,6 +1066,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  webview_flutter:
+    dependency: "direct main"
+    description:
+      name: webview_flutter
+      sha256: ec81f57aa1611f8ebecf1d2259da4ef052281cb5ad624131c93546c79ccc7736
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
+  webview_flutter_android:
+    dependency: transitive
+    description:
+      name: webview_flutter_android
+      sha256: "6e64fcb1c19d92024da8f33503aaeeda35825d77142c01d0ea2aa32edc79fdc8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.16.7"
+  webview_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: webview_flutter_platform_interface
+      sha256: d937581d6e558908d7ae3dc1989c4f87b786891ab47bb9df7de548a151779d8d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.10.0"
+  webview_flutter_wkwebview:
+    dependency: transitive
+    description:
+      name: webview_flutter_wkwebview
+      sha256: "1942a12224ab31e9508cf00c0c6347b931b023b8a4f0811e5dec3b06f94f117d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.15.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -1092,4 +1124,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.5.0 <4.0.0"
-  flutter: ">=3.22.0"
+  flutter: ">=3.24.0"

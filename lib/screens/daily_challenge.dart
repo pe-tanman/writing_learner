@@ -55,7 +55,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     int currentMaterialId = 0;
     int questionNumInCurrentSession = nextQuestionNum % 3;
     if (questionMaps.length <= questionNum) {
-      if (questionMaps.length == 0) {
+      if (questionMaps.isEmpty) {
         questionMap = questionMaps[questionNum];
         var random = math.Random();
         currentMaterialId = random.nextInt(materialMaps.length - 1);
@@ -93,7 +93,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
             ? LoadingIndicator()
@@ -128,7 +128,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
 
                     if ((page + 1) % 4 == 0) {
                       availableQuestionPages.add(QuestionResultScreen(
-                          null, 0, questionNum - 2, questionNum, true));
+                          null, 0, 0, 2, true));
                     } else {
                       await preloadNextPage(ref, questionNum, context);
                     }

@@ -88,7 +88,7 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
             ? LoadingIndicator()

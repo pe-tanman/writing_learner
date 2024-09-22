@@ -65,7 +65,7 @@ class QuestionViewState extends ConsumerState<QuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
             ? LoadingIndicator()

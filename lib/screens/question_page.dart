@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/themes/app_theme.dart';
@@ -63,10 +64,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                   child: showAnswer
                       ? Column(
                           children: [
-                            ModifiedAnswerRichText(page: questionNum),
-                            Text(
-                                '正答率 :${questionData.wrongWordsCount}%'),
-                                _getLinearGauge()                                
+                            ModifiedAnswerRichText(page: questionNum),                          
                           ],
                         )
                       : Container()),

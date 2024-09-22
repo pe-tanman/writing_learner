@@ -45,3 +45,4 @@ app.*.map.json
 
 # secret
 .env
+/android/wridge_key.jks

@@ -80,7 +80,7 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
             ? LoadingIndicator()

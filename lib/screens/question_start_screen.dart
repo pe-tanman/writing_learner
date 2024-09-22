@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/themes/app_color.dart';
 
 class QuestionStartScreen extends ConsumerStatefulWidget {
