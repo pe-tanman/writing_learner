@@ -238,7 +238,6 @@ class DailyChallengeDatabaseHelper {
   static Database? _database;
   Future<Database?> get database async {
     if (_database != null) {
-      
       return _database;
     }
     _database = await initDatabase();
@@ -247,14 +246,14 @@ class DailyChallengeDatabaseHelper {
   }
 
   Future<Database> initDatabase() async {
-    String path = join(await getDatabasesPath(), "daily_challenge3.db");
+    String path = join(await getDatabasesPath(), "daily_challenge4.db");
     print('init');
     return await openDatabase(
       path,
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute('''
-          CREATE TABLE daily_challenge_table3(
+          CREATE TABLE daily_challenge_table4(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
            date INTEGER UNIQUE,
            streak_count INTEGER,
@@ -288,31 +287,37 @@ class DailyChallengeDatabaseHelper {
       'streak_count': streakCount,
       'accuracy_rate': accuracyRate,
     };
-    await db!.insert('daily_challenge_table3', data,
+    await db!.insert('daily_challenge_table4', data,
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<int?> getPreviousDate() async {
     final Database? db = await database;
-    List<Map<String, dynamic>> result = await db!.query('daily_challenge_table3',
-        where: 'accuracy_rate IS NOT NULL', orderBy: 'id DESC', limit: 1);
+    List<Map<String, dynamic>> result = await db!.query(
+        'daily_challenge_table4',
+        where: 'accuracy_rate IS NOT NULL',
+        orderBy: 'id DESC',
+        limit: 1);
     if (result.isNotEmpty) {
-      print(result.first);
       return result.first['date'] as int?;
     } else {
       return null; // レコードがない場合
     }
   }
+
   Future<List<Map>> getAllData() async {
     final Database? db = await database;
-    return await db!.query('daily_challenge_table3', orderBy: 'id DESC');
+    return await db!.query('daily_challenge_table4', orderBy: 'id DESC');
   }
+
   Future<int?> getStreakCount() async {
     final Database? db = await database;
-    List<Map<String, dynamic>> result = await db!.query('daily_challenge_table3',
-        where: 'accuracy_rate IS NOT NULL', orderBy: 'id DESC', limit: 1);
+    List<Map<String, dynamic>> result = await db!.query(
+        'daily_challenge_table4',
+        where: 'accuracy_rate IS NOT NULL',
+        orderBy: 'id DESC',);
     if (result.isNotEmpty) {
-      print(result.first);
+     
       return result.first['streak_count'] as int?;
     } else {
       return null; // レコードがない場合

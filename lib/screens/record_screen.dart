@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:writing_learner/provider/database_helper.dart';
 import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/themes/app_color.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 
 class ProgressRecordScreen extends StatefulWidget {
   @override
@@ -16,11 +17,20 @@ class _ProgressRecordScreenState extends State<ProgressRecordScreen> {
   var isInit = true;
   Future<void> getStreakCount() async {
     streakCount = await dailyChallengeDatabaseHelper.getStreakCount();
-    streakCount--;
-    setState(() {
-      isLoading = false;
-      isInit = false;
-    });
+    if (null == streakCount) {
+      streakCount = 0;
+      setState(() {
+        isLoading = false;
+        isInit = false;
+      });
+    } else {
+      print(streakCount);
+      streakCount -= 1;
+      setState(() {
+        isLoading = false;
+        isInit = false;
+      });
+    }
   }
 
   @override
@@ -34,17 +44,28 @@ class _ProgressRecordScreenState extends State<ProgressRecordScreen> {
             ? CircularProgressIndicator()
             : Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: ListView.builder(
-                  itemCount: 14,
-                  itemBuilder: (context, index) {
-                    return ProgressStep(
-                      step: index,
-                      isCompleted:
-                          index < streakCount, // Assume steps 1-3 are completed
-                      isActive: index ==
-                          streakCount, // Assume step 4 is the active step
-                    );
-                  },
+                child: Column(
+                  children: [
+                    Text(
+                      'デイリーチャレンジ連続記録',
+                      style: appTheme().textTheme.headlineMedium,
+                    ),
+                    SizedBox(height: 20),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: 14,
+                        itemBuilder: (context, index) {
+                          return ProgressStep(
+                            step: index,
+                            isCompleted:
+                                index < streakCount, // Assume steps 1-3 are completed
+                            isActive: index ==
+                                streakCount, // Assume step 4 is the active step
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
       ),
@@ -104,20 +125,27 @@ class _ProgressStepState extends State<ProgressStep> {
       for (var i = streakCount; i < 14; i++) {
         result.add(-1);
       }
-      print(result);
+
       
-      setState(() {
-        accuracyList = result;
-        isLoading = false;
-      });
     }
+    else{
+      for (var i = 0; i < 14; i++) {
+        result.add(-1);
+      }
+    }
+    setState(() {
+      accuracyList = result;
+      isLoading = false;
+      isInit = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     if (isInit) {
       accuracyRates();
-      isInit = false;
+
+      
     }
     return isLoading
         ? CircularProgressIndicator()
