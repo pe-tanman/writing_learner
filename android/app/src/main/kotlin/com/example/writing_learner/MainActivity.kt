@@ -1,4 +1,4 @@
-package com.example.writing_learner
+package com.wridge.wridge
 
 import io.flutter.embedding.android.FlutterActivity
 

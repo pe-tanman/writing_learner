@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/screens/question_page.dart';
+import 'package:writing_learner/screens/question_result_screen.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
+import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class QuestionView extends ConsumerStatefulWidget {
   const QuestionView({super.key});
@@ -20,6 +22,8 @@ class QuestionViewState extends ConsumerState<QuestionView> {
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
+  int materialId = 0;
+  int startQuestionId = 0;//TODO:
   late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
@@ -36,11 +40,11 @@ class QuestionViewState extends ConsumerState<QuestionView> {
 
   Future<void> preloadNextPage(WidgetRef ref, int nextQuestion) async {
     String levelStr = ModalRoute.of(context)!.settings.arguments as String;
-    String questionSentence = await GenerativeService().generateText(
-        '$levelStr大学入試対策になるような英訳問題の和文をランダムに出力して。ただし問題の和文のみ一文を出力すること。');
+    String questionSentence =
+        await GenerativeService().generateTranslationQuestion(levelStr);
     ref
         .read(questionDataProvider.notifier)
-        .addQuestionSentence(questionSentence);
+        .addQuestionSentence(materialId, questionSentence);
     availableQuestionPages.add(QuestionPage(
       questionNum: nextQuestion,
     ));
@@ -61,17 +65,10 @@ class QuestionViewState extends ConsumerState<QuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
-            ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('あなたに最適な問題を作成中')
-                  ],
-                ),
-              )
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&
@@ -103,7 +100,11 @@ class QuestionViewState extends ConsumerState<QuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionStartScreen());
+                      availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 3,
+                          questionNum, false));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

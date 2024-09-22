@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 
 class SuggestionCard extends StatelessWidget {
   final String suggestion;
+  final String errorTag;
   final String reason;
   final VoidCallback onApply;
 
   const SuggestionCard({
     super.key,
     required this.suggestion,
+    required this.errorTag,
     required this.reason,
     required this.onApply,
   });
@@ -22,11 +25,13 @@ class SuggestionCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Suggestion: $suggestion'),
-            Text('Reason: $reason'),
-            TextButton(
-              onPressed: onApply,
-              child: const Text('Apply'),
+            (reason.isEmpty)?
+            const CircularProgressIndicator():
+            Column(
+              children: [
+                Text('#: $errorTag', style: appTheme().textTheme.headlineSmall),
+                Text(reason),
+              ],
             ),
           ],
         ),

@@ -1,13 +1,17 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:flutter/gestures.dart';
-import 'package:writing_learner/utilities/generative_content.dart';
+import 'package:writing_learner/themes/app_color.dart';
+import 'package:writing_learner/utilities/generative_service.dart';
 import 'package:writing_learner/widgets/suggestion_card.dart';
-
+import 'package:writing_learner/provider/emoji_converter.dart';
 class ModifiedAnswerRichText extends ConsumerStatefulWidget {
   final int page;
-  ModifiedAnswerRichText({super.key, required this.page});
+  const ModifiedAnswerRichText({super.key, required this.page});
 
   @override
   ConsumerState<ModifiedAnswerRichText> createState() =>
@@ -19,7 +23,7 @@ class ModifiedAnswerRichTextState
   ModifiedAnswerRichTextState(this.page);
 
   final int page;
-  List<GrammarError> _errors = <GrammarError>[];
+  final List<GrammarError> _errors = []; //間違いの箇所や理由を記録する
   bool isLoading = true;
   String answeredSentence = '';
   OverlayEntry? _overlayEntry;
@@ -30,9 +34,10 @@ class ModifiedAnswerRichTextState
       _overlayEntry!.remove();
     }
     _overlayEntry = _createOverlayEntry(error);
-    Overlay.of(context)?.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
+//理由を表示するカード
   OverlayEntry _createOverlayEntry(GrammarError error) {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var size = renderBox.size;
@@ -58,8 +63,9 @@ class ModifiedAnswerRichTextState
                   child: GestureDetector(
                     onTap: () {},
                     child: SuggestionCard(
-                      suggestion: error.suggestedStr,
-                      reason: error.reason,
+                      suggestion: error.suggestion,
+                      errorTag: GrammarError.toErrorType(error.type),
+                      reason: error.detailedReason,
                       onApply: () {
                         _overlayEntry?.remove();
                       },
@@ -74,15 +80,6 @@ class ModifiedAnswerRichTextState
     );
   }
 
-  /*void _applySuggestion(GrammarError error) {
-    setState(() {
-      String newText = answeredSentence.replaceRange(
-          error.start, error.end, error.suggestedStr);
-      answeredSentence = newText;
-      _errors = [];
-    });
-  }*/
-
   int _findNextMatch(
       List<String> words1, List<String> words2, int start1, int start2) {
     for (int k = start2; k < words2.length; k++) {
@@ -93,129 +90,167 @@ class ModifiedAnswerRichTextState
     return -1;
   }
 
-  List<InlineSpan> spans(String answerSentence, String modifiedSentence) {
-    List<String> words1 = answerSentence.split(' ');
-    List<String> words2 = modifiedSentence.split(' ');
-    List<InlineSpan> spans = [];
+//答え合わせの時のRichTextを生成する。ついでにaddReasonToErrorsも呼び出す
+  List<InlineSpan> answerSpans(String answerSentence, String modifiedSentence) {
+    List<InlineSpan> answerSpans = [];
 
-    int i = 0, j = 0;
-    while (i < words1.length || j < words2.length) {
-      if (i < words1.length && j < words2.length && words1[i] == words2[j]) {
-        //matching
-        spans.add(TextSpan(
-            text: '${words2[j]} ',
+    // Define the error array
+    List<GrammarError> errorArray = ref.read(questionDataProvider)[page].errors;
+
+    // Process the answer sentence
+    int currentIndex = 0;
+    for (var error in errorArray) {
+      String originalPhrase = error.original;
+      int originalStartIndex =
+          answerSentence.indexOf(originalPhrase, currentIndex);
+
+      if (originalStartIndex != -1) {
+        // Add text before the original phrase
+        if (originalStartIndex > currentIndex) {
+          answerSpans.add(TextSpan(
+            text: answerSentence.substring(currentIndex, originalStartIndex),
             style: const TextStyle(
-                fontSize: 15,
-                decoration: TextDecoration.none,
-                color: Colors.black)));
-        i++;
-        j++;
-      } else {
-        // Find the next matching word
-        int nextMatch = _findNextMatch(words1, words2, i, j);
-
-        if (nextMatch == -1 || words1.indexOf(words2[nextMatch], i) == -1) {
-          // No more matches, add all remaining words with underline
-          GrammarError error = GrammarError(
-              start: j,
-              end: words2.length - 1,
-              original: words1.sublist(i, words1.length),
-              suggestion: words2.sublist(j, words2.length));
-          _errors.add(error);
-
-          while (j < words2.length) {
-            spans.add(TextSpan(
-              text: '${words2[j]} ',
-              style: const TextStyle(
-                  fontSize: 15, decoration: TextDecoration.underline),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  _showSuggestionCard(error);
-                },
-            ));
-            j++;
-          }
-          break;
-        } else {
-          // Add words up to the next match with underline
-          print(words2[nextMatch]);
-          GrammarError error = GrammarError(
-              start: j,
-              end: nextMatch,
-              original: words1.sublist(i, words1.indexOf(words2[nextMatch], i)),
-              suggestion: words2.sublist(j, nextMatch));
-          _errors.add(error);
-
-          while (j < nextMatch) {
-            spans.add(TextSpan(
-              text: '${words2[j]} ',
-              style: const TextStyle(
-                  fontSize: 15, decoration: TextDecoration.underline),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  _showSuggestionCard(error);
-                },
-            ));
-            j++;
-          }
-          i = words1.indexOf(words2[nextMatch], i);
+              fontSize: 15,
+              decoration: TextDecoration.none,
+              color: Colors.black,
+            ),
+          ));
         }
+
+        // Add the original phrase with underline
+        answerSpans.add(TextSpan(
+          text: originalPhrase,
+          style: TextStyle(
+            fontSize: 15,
+            color: AppColors.accentTextColor,
+          ),
+        ));
+
+        currentIndex = originalStartIndex + originalPhrase.length;
       }
     }
-    getReason();
-    return spans;
+
+    // Add remaining text in answer sentence
+    if (currentIndex < answerSentence.length) {
+      answerSpans.add(TextSpan(
+        text: answerSentence.substring(currentIndex),
+        style: const TextStyle(
+          fontSize: 15,
+          decoration: TextDecoration.none,
+          color: Colors.black,
+        ),
+      ));
+    }
+
+    // Process the modified sentence
+
+    return answerSpans;
   }
 
-  Future<void> getReason() async {
-    String questionSentence = ref.watch(questionDataProvider)[page].question;
-    String answerSentence = ref.watch(questionDataProvider)[page].answer;
-    String modifiedSentence = ref.watch(questionDataProvider)[page].modified;
-    String modificationSetsString = '';
-    for (GrammarError error in _errors) {
-      modificationSetsString =
-          '$modificationSetsString${error.oritinalStr}→${error.suggestedStr}, ';
+  List<InlineSpan> modifiedSpans(
+      String answerSentence, String modifiedSentence) {
+    var errorArray = ref.read(questionDataProvider)[page].errors;
+    var modifiedSpans = <InlineSpan>[];
+    var currentIndex = 0;
+    for (var error in errorArray) {
+      String suggestedPhrase = error.suggestion;
+      int suggestedStartIndex =
+          modifiedSentence.indexOf(suggestedPhrase, currentIndex);
+
+      if (suggestedStartIndex != -1) {
+        // Add text before the suggested phrase
+        if (suggestedStartIndex > currentIndex) {
+          modifiedSpans.add(TextSpan(
+            text: modifiedSentence.substring(currentIndex, suggestedStartIndex),
+            style: const TextStyle(
+              fontSize: 15,
+              decoration: TextDecoration.none,
+              color: Colors.black,
+            ),
+          ));
+        }
+
+        // Add the suggested phrase with underline
+        modifiedSpans.add(TextSpan(
+          text: suggestedPhrase,
+          style: TextStyle(
+            fontSize: 15,
+            decoration: TextDecoration.underline,
+            color: AppColors.accentTextColor,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              _showSuggestionCard(error);
+            },
+        ));
+
+        currentIndex = suggestedStartIndex + suggestedPhrase.length;
+      }
     }
 
-    String reason = await GenerativeService().generateText(
-        '英訳問題(0): $questionSentence, 英訳回答(1): $answerSentence, 回答の修正(2): $modifiedSentence (1)の回答は(2)のように修正された[(1)→(2)]。修正の理由をそれぞれ教えて。ただし簡潔な修正の理由のリスト（カンマ区切り、日本語）のみ出力すること。: $modificationSetsString');
-    print('reason$reason');
-    print(_errors);
-    List reasons = reason.split(', ');
-
-    for (int i = 0; i < _errors.length; i++) {
-      _errors[i].reason = reasons[i];
+    // Add remaining text in modified sentence
+    if (currentIndex < modifiedSentence.length) {
+      modifiedSpans.add(TextSpan(
+        text: modifiedSentence.substring(currentIndex),
+        style: const TextStyle(
+          fontSize: 15,
+          decoration: TextDecoration.none,
+          color: Colors.black,
+        ),
+      ));
     }
+
+    return modifiedSpans;
+  }
+
+//questionDataが正確に呼び出せなかった時に再実行する
+  Future<void> laterReadQuestionData() async {
+    Future.delayed(Duration(seconds: 2), () {
+      var isAnswered = ref.watch(isAnsweredProvider);
+      if (isAnswered) {
+        setState(() {
+          isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+        });
+        print(ref.watch(questionDataProvider));
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var questionData = ref.watch(questionDataProvider)[page];
-    isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+    setState(() {
+      isLoading = (ref.watch(questionDataProvider)[page].modified == '');
+    });
+    if (isLoading) {
+      laterReadQuestionData();
+    }
     return isLoading
         ? const CircularProgressIndicator()
-        : RichText(
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
-              children: spans(questionData.answer, questionData.modified),
-            ),
+        : Column(
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: answerSpans(questionData.answer, questionData.modified),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Icon(Icons.keyboard_double_arrow_down_rounded,
+                    size: 50, color: AppColors.themeColor),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: modifiedSpans(questionData.answer, questionData.modified)
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(EmojiConverter.convertAccuracyToEmoji(
+                  questionData.wrongWordsCount), style: TextStyle(fontSize: 40
+                  ),)
+            ],
           );
   }
-}
-
-class GrammarError {
-  final int start;
-  final int end;
-  final List<String> original;
-  final List<String> suggestion;
-  String oritinalStr;
-  String suggestedStr;
-  String reason = '';
-
-  GrammarError(
-      {required this.start,
-      required this.end,
-      required this.original,
-      required this.suggestion})
-      : oritinalStr = original.join(' '),
-        suggestedStr = suggestion.join(' ');
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
-import 'package:writing_learner/screens/proverb_question_page.dart';
+import 'package:writing_learner/screens/question_page.dart';
 import 'package:writing_learner/screens/question_start_screen.dart';
+import 'package:writing_learner/screens/question_result_screen.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/provider/question_provider.dart';
 import 'package:fast_csv/fast_csv.dart' as fast_csv;
+import 'package:writing_learner/widgets/loading_indicator.dart';
 
 class ProverbQuestionView extends ConsumerStatefulWidget {
   const ProverbQuestionView({super.key});
@@ -23,6 +25,8 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
   var answered = false;
   int currentPage = 0;
   int questionNum = -1;
+  int materialId = 4;
+  int startQuestionId = 0;
   late PageController _pageController;
 
   List<Widget> availableQuestionPages = [];
@@ -50,12 +54,15 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
     String questionSentence = csvData[nextQuestion][0];
     String modifiedSentence = csvData[nextQuestion][1];
     QuestionData questionData = QuestionData(
+        materialId: materialId,
         question: questionSentence,
         answer: '',
         modified: modifiedSentence,
-        wrongWordsCount: 0);
+        wrongWordsCount: 0,
+        errors: []);
+
     ref.read(questionDataProvider.notifier).addQuestionData(questionData);
-    availableQuestionPages.add(ProverbQuestionPage(questionNum: nextQuestion));
+    availableQuestionPages.add(QuestionPage(questionNum: nextQuestion));
   }
 
   var answerSentence = '';
@@ -73,17 +80,10 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
 
     return Scaffold(
         appBar: AppBar(
-          actions: [],
+          actions: const [],
         ),
         body: isLoading
-            ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('あなたに最適な問題を作成中')
-                  ],
-                ),
-              )
+            ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
                   if (notification is ScrollUpdateNotification &&
@@ -94,12 +94,10 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                         ref.watch(isAnsweredProvider)) {
                     } else if (metrics.page! < currentPage.toDouble()) {
                       _pageController.jumpToPage(currentPage);
-                      print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
                         !ref.watch(isAnsweredProvider)) {
                       _pageController.jumpToPage(currentPage);
-                      print('prohibited');
                       return true;
                     }
                   }
@@ -114,7 +112,11 @@ class ProverbQuestionViewState extends ConsumerState<ProverbQuestionView> {
                     }
 
                     if ((page + 1) % 6 == 0) {
-                      availableQuestionPages.add(const QuestionStartScreen());
+                      availableQuestionPages.add(QuestionResultScreen(
+                          materialId,
+                          startQuestionId,
+                          questionNum - 3,
+                          questionNum, false));
                     } else {
                       await preloadNextPage(ref, questionNum + 1);
                     }

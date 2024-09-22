@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/database_helper.dart';
+import 'package:writing_learner/screens/daily_challenge.dart';
+import 'package:writing_learner/screens/filling_question_view.dart';
+import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,71 +25,132 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   var modifiedSentence = '';
 
   bool isLoading = false;
+  DailyChallengeDatabaseHelper dailyChallengeDatabaseHelper =
+      DailyChallengeDatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('\nホーム'),
-        ),
-        body: const Column(
-          children: [HorizontalContents()],
-        ));
-  }
-}
-
-class HorizontalContents extends ConsumerWidget {
-  const HorizontalContents({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Text(
-                  '最近学習した教材',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Icon(Icons.arrow_right_alt)
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Text(
+                    'デイリーチャレンジ',
+                    style: appTheme().textTheme.headlineMedium,
+                  ),
+                  const Icon(Icons.arrow_right_alt)
+                ],
+              ),
             ),
-          ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildItem('AI東大英訳', '和文英訳', 'lib/assets/ai_image.jpeg',
-                    QuestionView.routeName, context, ref, '東京'),
-                _buildItem('ことわざ', '表現', 'lib/assets/ai_image.jpeg',
-                    ProverbQuestionView.routeName, context, ref),
-                _buildItem('構文150', '構文', 'lib/assets/ai_image.jpeg',
-                    ProverbQuestionView.routeName, context, ref),
-              ]),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                height: 200,
+                width: 400,
+                decoration: BoxDecoration(
+                  color: AppColors.themeColor,
+                  borderRadius: BorderRadius.circular(20),
+                  image: const DecorationImage(
+                      image: AssetImage('lib/assets/yellow_wide.png'),
+                      fit: BoxFit.fill),
+                ),
+                child: InkWell(
+                  onTap: () async {
+                    print('tapped');
+                    //クリア済みの時の処理R
+                    var previous =
+                        await dailyChallengeDatabaseHelper.getPreviousDate();
+                    var today =
+                        dailyChallengeDatabaseHelper.getTodayAsInt();
+                        print('previous: $previous');
+                        print('today: $today');
+                    if (previous == today) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('今日のデイリーチャレンジはクリア済みです'),
+                        ),
+                      );
+                      print('cleared');
+                    } else {
+                      Navigator.of(context)
+                          .pushNamed(DailyChallengeScreen.routeName);
+                      ref.watch(questionDataProvider.notifier).clearQuestions();
+                    }
+                  },
+                  child: const Center(
+                    child: Text(
+                      '今すぐ挑戦',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Text(
+                    '最近学習した教材',
+                    style: appTheme().textTheme.headlineMedium,
+                  ),
+                  const Icon(Icons.arrow_right_alt)
+                ],
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildItem('AI最難関英訳', '和文英訳', 'lib/assets/blue.png',
+                      QuestionView.routeName, context, ref, 'Tokyo'),
+                  _buildItem(
+                      'Write to the point',
+                      '英訳教材',
+                      'lib/assets/blue.png',
+                      W2pQuestionView.routeName,
+                      context,
+                      ref),
+                  _buildItem('AI最難関穴埋め', '和文英訳', 'lib/assets/coming_square.png',
+                      FillingQuestionView.routeName, context, ref, 'Tokyo'),
+                  _buildItem('ことわざ', '表現', 'lib/assets/coming_square.png',
+                      ProverbQuestionView.routeName, context, ref),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildItem(String title, String discription, var imagePath, var route,
-      var context, WidgetRef ref, [String? levelStr]) {
-    return Expanded(
+      var context, WidgetRef ref,
+      [String? levelStr]) {
+    return SizedBox(
+      width: 180,
+      height: 240,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: InkWell(
           onTap: () {
-            if(levelStr == null){
+            if (levelStr == null) {
               Navigator.of(context).pushNamed(route);
-            }
-            else{
+            } else {
               Navigator.of(context).pushNamed(route, arguments: levelStr);
             }
-            
+
             ref.read(questionDataProvider.notifier).clearQuestions();
             ref.read(isAnsweredProvider.notifier).state = true;
           },
@@ -93,13 +159,13 @@ class HorizontalContents extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: AppColors.themeColor),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    height: 119,
+                    height: 144,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(imagePath),
@@ -118,6 +184,7 @@ class HorizontalContents extends ConsumerWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
+                          color: AppColors.lightText1,
                         ),
                       ),
                       Text(
@@ -125,6 +192,7 @@ class HorizontalContents extends ConsumerWidget {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
+                          color: AppColors.lightText1,
                         ),
                       ),
                     ],

@@ -1,0 +1,219 @@
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "最近の研究によると、一週間に数回、30分くらいのジョギングをする人は、長生きする可能性が高いそうだ。"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "オリンピックの試合で勝つにはかなりの体力が必要になるので、運動選手はしっかり練習しなければならない"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "単に実験として始まったものが、すぐに主要な理論へと発展し、それに基づいて新しい発明が生まれた"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "彼らは彼らを学校へ行かせてあげるだけの経済的な余裕がなかったので、とても後ろめたい気持ちがしました。"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "私はこの夏アメリカに行き、そしてそこで話されている英語は学校で習った英語とは少し違っているのに気が付いた。"
+        }
+    ]
+}{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "Thomas Edisonは、130年以上前に実用的な電球を発明したとき、何千回にも及ぶ実験を行った。科学者たちは彼の方法と忍耐力に、今なお驚かさせるのだ。"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "運転中に携帯電話を使うのはとても危険だ"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "これは彼が間違っていることの証明にはなっていない。"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "劇場に行くのに予想より1時間半余計にかかった。"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "体が悪いと分かっていながら、どうして煙草を吸うのだろう。　"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "趣味に専念することによって、より深い人生観が生まれるのです"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "すべての物質は、その特徴に基づいて、固体、液体、気体の３つに大きく分けられる　"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "こうした人々や場所とのつながりがわかると、歴史的な話題もずっと身近なものになるよ。"
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful and kind English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+        },
+        {
+            "role": "user",
+            "content": " 'Task: Generate Japanse sentence for a translation(Japanese to English) task in Tokyo University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.'"
+        },
+        {
+            "role": "assistant",
+            "content": "英国人の生活にとって庭が再び重要になったのは、中世になってからであった。"
+        }
+    ]
+}

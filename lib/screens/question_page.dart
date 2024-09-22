@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/provider/is_answered_privider.dart';
 import 'package:writing_learner/provider/question_provider.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 import 'package:writing_learner/widgets/modify_answer_block.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class QuestionPage extends ConsumerStatefulWidget {
   const QuestionPage({super.key, required this.questionNum});
@@ -28,7 +31,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('問題文:\n${questionData.question}'),
+              Text(questionData.question),
               const SizedBox(height: 15),
               TextField(
                 autocorrect: false,
@@ -41,10 +44,9 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                 },
               ),
               const SizedBox(
-                height: 15,
+                height: 30,
               ),
-              ElevatedButton(
-                  onPressed: () async{
+              primaryButton('答え合わせ', ()async{
                     if(ref.read(isAnsweredProvider)){
                       return;
                     }
@@ -52,30 +54,40 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                       showAnswer = true;
                     });
                     
-                    await notifier.addAnswer(questionNum, answerSentence);
+                    await notifier.addAnswerAndModify(questionNum, answerSentence);
                     ref.read(isAnsweredProvider.notifier).state = true;
                     
-                  },
-                  child: Text('答え合わせ')),
-              Container(
-                height: 200,
-                width: 500,
-                color: Colors.grey,
-                child: Center(
-                    child: showAnswer
-                        ? Column(
-                            children: [
-                              ModifiedAnswerRichText(page: questionNum),
-                              Text(
-                                  '間違い :${questionData.wrongWordsCount.toString()}')
-                            ],
-                          )
-                        : Container()),
-              ),
+                  }),
+              Center(
+                  child: showAnswer
+                      ? Column(
+                          children: [
+                            ModifiedAnswerRichText(page: questionNum),                          
+                          ],
+                        )
+                      : Container()),
             ],
           ),
         ),
       ),
+    );
+  }
+    Widget _getLinearGauge() {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: SfLinearGauge(
+          minimum: 0.0,
+          maximum: 100.0,
+          orientation: LinearGaugeOrientation.horizontal,
+          showTicks: false,
+          showLabels: false,
+          animateAxis: true,
+          axisTrackStyle: LinearAxisTrackStyle(
+            
+              color: appTheme().primaryColor,
+              edgeStyle: LinearEdgeStyle.bothFlat,
+              thickness: 15.0,
+              borderColor: Colors.grey)),
     );
   }
 }
