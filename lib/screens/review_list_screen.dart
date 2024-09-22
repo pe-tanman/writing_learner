@@ -67,49 +67,41 @@ class _ReviewListScreenState extends State<ReviewListScreen> {
     }
     
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: isLoading
-            ?  const CircularProgressIndicator()
-            : (reviewList.isEmpty)?const Center(child:Text('復習する問題がありません')):Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.themeColor),
-                      onPressed: () => Navigator.of(context)
-                          .pushNamed(ReviewQuestionView.routeName),
-                      child: const SizedBox( child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 13, horizontal: 60),
-                        child:  Text('復習を始める', style: TextStyle(color:Colors.white, fontSize: 20),),
-                      ))),
-                      const SizedBox(height: 20,),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: reviewList.length,
-                      separatorBuilder: (context, index) => const Divider(color: Colors.grey,),
-                      itemBuilder: (context, index) {
-                        final review = reviewList[index];
-                        return Card(
-                          child: ListTile(
-                            leading: CircleAvatar(backgroundColor: AppColors.themeColor, radius:25,  child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Text('${reviewList[index]['accuracy_rate']}%',style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            )),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(reviewList[index]['sentence']!),
-                                const SizedBox(height: 10),
-                                Text('#${reviewList[index]['error_tag']!}', style: const TextStyle(color:Colors.grey)),
-                              ],
-                            ),
+      body: isLoading
+          ?  const CircularProgressIndicator()
+          : (reviewList.isEmpty)?const Center(child:Text('復習する問題がありません')):Column(
+              children: [
+                primaryButton('復習を始める', (){
+                  Navigator.of(context).pushNamed(ReviewQuestionView.routeName);
+                }),
+                    const SizedBox(height: 20,),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: reviewList.length,
+                    separatorBuilder: (context, index) => const Divider(color: Colors.grey,),
+                    itemBuilder: (context, index) {
+                      final review = reviewList[index];
+                      return Card(
+                        child: ListTile(
+                          leading: CircleAvatar(backgroundColor: AppColors.themeColor, radius:25,  child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text('${reviewList[index]['accuracy_rate']}%',style: const TextStyle(color: Colors.white, fontSize: 16)),
+                          )),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(reviewList[index]['sentence']!),
+                              const SizedBox(height: 10),
+                              Text('#${reviewList[index]['error_tag']!}', style: const TextStyle(color:Colors.grey)),
+                            ],
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                ],
-              ),
-      ),
+                ),
+              ],
+            ),
     );
   }
 }

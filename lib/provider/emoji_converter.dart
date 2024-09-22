@@ -11,8 +11,11 @@ class EmojiConverter {
       return '🙂'; // Neutral face for average accuracy
     } else if (accuracy >= 30) {
       return '😟'; // Worried face for low accuracy
-    } else {
+    } else if (accuracy >= 0) {
       return '😢'; // Crying face for very low accuracy
+    }
+    else{
+      return ''; // Crying face for very low accuracy
     }
   }
   static Widget convertAccuracyToImage(int accuracy) {
@@ -182,7 +185,7 @@ class EmojiConverter {
             ),
           ));
       ; // Worried face for low accuracy
-    } else {
+    } else if (accuracy >= 0) {
       return Container(
           height: 200,
           width: 400,
@@ -198,6 +201,21 @@ class EmojiConverter {
             ),
           ));
     // Crying face for very low accuracy
+    } else {
+      return Container(
+          height: 200,
+          width: 400,
+          color: AppColors.themeColor,
+          child: const Center(
+            child: Text(
+              '',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ));
     }
   }
 }

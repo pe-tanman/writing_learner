@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/provider/question_provider.dart';
-import 'package:writing_learner/themes/app_color.dart';
+import 'package:writing_learner/screens/daily_challenge.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 import 'package:writing_learner/provider/database_helper.dart';
+
 
 class QuestionResultScreen extends ConsumerStatefulWidget {
   final int? materialId;
@@ -25,9 +26,12 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
   var pastQuestions = [];
   var questionData;
   int materialId = 0;
+  bool clear = false;
   QuestionDatabaseHelper dbHelper = QuestionDatabaseHelper();
   MaterialDatabaseHelper materialDbHelper = MaterialDatabaseHelper();
-  
+  DailyChallengeDatabaseHelper dailyChallengeDatabaseHelper =
+      DailyChallengeDatabaseHelper();
+
   int averageAccuracy() {
     var sum = 0;
     for (QuestionData question in pastQuestions) {
@@ -36,12 +40,24 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
     return (sum ~/ pastQuestions.length).round();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final questionData = ref.watch(questionDataProvider);
-    pastQuestions = [];
+  List errorTags(questionList) {
+    var result = [];
+    for (var element in questionList) {
+      var errors = element.errors;
+      if (errors == null) {
+        continue;
+      }
+      var errorStrList = [];
+      for (var error in errors) {
+        errorStrList.add(GrammarError.toErrorType(error.type));
+      }
+      var errorTagStr = errorStrList.join(',');
+      result.add(errorTagStr);
+    }
+    return result;
+  }
 
-    //データ保存
+  void saveData() {
     for (var questionNum = widget.startQuestionNum;
         questionNum <= widget.endQuestionNum;
         questionNum++) {
@@ -53,92 +69,111 @@ class _QuestionResultScreenState extends ConsumerState<QuestionResultScreen> {
       }
 
       if (widget.materialId != null) {
-        
-        dbHelper.updateAccuracyRateAndError(widget.materialId!,
-            widget.startQuestionId + questionNum, data.wrongWordsCount, errorTags);
+        dbHelper.updateAccuracyRateAndError(
+            widget.materialId!,
+            widget.startQuestionId + questionNum,
+            data.wrongWordsCount,
+            errorTags);
       } else {
         materialId = data.materialId;
         dbHelper.updateAccuracyRateAndError(
-            materialId, questionNum, data.wrongWordsCount, errorTags );
+            materialId, questionNum, data.wrongWordsCount, errorTags);
       }
     }
     if (widget.materialId != null) {
       materialDbHelper.updateNextNumber(widget.materialId!,
           (widget.endQuestionNum + widget.startQuestionId + 1));
     } else {
-      materialDbHelper.updateNextNumber(materialId,( widget.endQuestionNum + widget.startQuestionId + 1));
+      materialDbHelper.updateNextNumber(
+          materialId, (widget.endQuestionNum + widget.startQuestionId + 1));
     }
+  }
 
-    List<TableCell> countTableRow = pastQuestions.map((question) {
-      return TableCell(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(EmojiConverter.convertAccuracyToEmoji(question.wrongWordsCount), style: TextStyle(fontSize: 30),)),
-        ),
-      );
-    }).toList();
-    List<TableCell> numTableRow =
-        Iterable<int>.generate(widget.endQuestionNum-widget.startQuestionNum+1, (i) => i + 1).map((number) {
-      return TableCell(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(number.toString())),
-        ),
-      );
-    }).toList();
-    
+  void evaluateAndSaveDailyChallenge() {
+    var accuracy = averageAccuracy();
+    if (accuracy >= 60) {
+      clear = true;
+      print('clear');
+      dailyChallengeDatabaseHelper.insertData(accuracy);
+    } else {
+      print('failed');
+      clear = false;
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    questionData = ref.watch(questionDataProvider);
+    pastQuestions = [];
+
+    //データ保存
+    saveData();
+    evaluateAndSaveDailyChallenge();
     return Scaffold(
         body: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        widget.isDailyChallenge? EmojiConverter.convertAccuracyToPassFail(averageAccuracy()) :EmojiConverter.convertAccuracyToImage(averageAccuracy()),
-        const SizedBox(height: 20),
-        Divider(
-          color: AppColors.accentColor,
-          thickness: 2,
+        widget.isDailyChallenge
+            ? EmojiConverter.convertAccuracyToPassFail(averageAccuracy())
+            : EmojiConverter.convertAccuracyToImage(averageAccuracy()),
+        const SizedBox(height: 40),
+        Text(
+          '結果詳細',
+          style: appTheme().textTheme.headlineSmall,
         ),
-        const SizedBox(height: 20),
-        Table(
-          border: const TableBorder(
-            verticalInside: BorderSide(width: 0.7),
-          ),
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            TableRow(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: AppColors.themeColor.withAlpha(100),
-              ),
-              children: [
-                    const TableCell(
-                        child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(child: Text('#')),
-                    ))
-                  ] +
-                  numTableRow,
+        Expanded(
+          child: ListView.separated(
+            itemCount: pastQuestions.length,
+            separatorBuilder: (context, index) => const Divider(
+              color: Colors.grey,
             ),
-            TableRow(
-              children: [
-                    const TableCell(
-                        child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Center(child: Text('正答率')),
-                    ))
-                  ] +
-                  countTableRow,
-            ),
-          ],
-        ),
-        const SizedBox(height: 30),
-        if(widget.isDailyChallenge)
-         ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.accentColor),
-            onPressed: () {
-              Navigator.pop(context);
+            itemBuilder: (context, index) {
+              final review = pastQuestions[index];
+              return Card(
+                child: ListTile(
+                  trailing: Text(
+                      EmojiConverter.convertAccuracyToEmoji(
+                        pastQuestions[index].wrongWordsCount,
+                      ),
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 30)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(pastQuestions[index].question!),
+                      const SizedBox(height: 10),
+                      Text('#${errorTags(pastQuestions)[index]}',
+                          style: const TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              );
             },
-            child: const Text('ホームに戻る',style:TextStyle(color: Colors.white, fontSize: 22))),
+          ),
+        ),
+        if (widget.isDailyChallenge)
+          Column(
+            children: clear
+                ? [
+                    primaryButton('ホームへ戻る', () {
+                      Navigator.of(context).pop();
+                      
+                    }),
+                    const SizedBox(height: 20),
+                  ]
+                : [
+                    primaryButton('もう一度挑戦', () {
+                      ref.watch(questionDataProvider.notifier).clearQuestions();
+                      Navigator.of(context)
+                          .pushNamed(DailyChallengeScreen.routeName);
+                    }),
+                    const SizedBox(height: 20),
+                    secondaryButton('ホームへ戻る', () {
+                      Navigator.of(context).pop();
+                    }),
+                    const SizedBox(height: 20),
+                  ],
+          ),
       ]),
     ));
   }

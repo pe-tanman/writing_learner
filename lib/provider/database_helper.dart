@@ -21,7 +21,7 @@ class QuestionDatabaseHelper {
       return _database;
     }
     _database = await initDatabase();
-    
+
     return _database;
   }
 
@@ -81,8 +81,10 @@ class QuestionDatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getReviewData() async {
     final Database? db = await database;
-    return await db!.query('question_table',  where: 'accuracy_rate IS NOT NULL', orderBy: 'accuracy_rate ASC');
+    return await db!.query('question_table',
+        where: 'accuracy_rate IS NOT NULL', orderBy: 'accuracy_rate ASC');
   }
+
   Future<List<Map<String, dynamic>>> getQuestionData(materialId) async {
     final Database? db = await database;
     return await db!.query('question_table',
@@ -97,12 +99,13 @@ class QuestionDatabaseHelper {
     var materialId = random.nextInt(materialMaps.length - 1);
     var questionId = materialMaps[materialId]['next_number'];
     materialDatabaseHelper.updateNextNumber(materialId, questionId + 1);
-    return await db!.query('question_table', where: 'material_id = ? and question_number = ?', whereArgs: [materialId, questionId]);
+    return await db!.query('question_table',
+        where: 'material_id = ? and question_number = ?',
+        whereArgs: [materialId, questionId]);
   }
 
-  Future<void> insertData(
-      materialId, questionNumber, questionSentence, int? accuracyRate, List<int>? tags) async {
-
+  Future<void> insertData(materialId, questionNumber, questionSentence,
+      int? accuracyRate, List<int>? tags) async {
     final Database? db = await database;
     tags ??= [];
     var tagString = tags.join(',');
@@ -117,8 +120,8 @@ class QuestionDatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> updateAccuracyRateAndError(
-      int materialId, int questionNumber, int accuracyRate, List<int> errorTags) async {
+  Future<void> updateAccuracyRateAndError(int materialId, int questionNumber,
+      int accuracyRate, List<int> errorTags) async {
     final Database? db = await database;
     Map<String, dynamic> data = {
       'accuracy_rate': accuracyRate,
@@ -151,7 +154,7 @@ class MaterialDatabaseHelper {
       return _database;
     }
     _database = await initDatabase();
-    
+
     return _database;
   }
 
@@ -186,7 +189,6 @@ class MaterialDatabaseHelper {
     final Database? db = await database;
     return await db!.query('material_table');
   }
-  
 
   Future<int> getNextNum(materialId) async {
     final Database? db = await database;
@@ -215,6 +217,111 @@ class MaterialDatabaseHelper {
     };
     await db!.update('material_table', data,
         where: 'id = ?', whereArgs: [materialId]);
+  }
+
+  Future<int> deleteData(int id) async {
+    final Database? db = await database;
+    return await db!.delete('material_table', where: 'id = ?', whereArgs: [id]);
+  }
+}
+
+class DailyChallengeDatabaseHelper {
+  static final DailyChallengeDatabaseHelper _instance =
+      DailyChallengeDatabaseHelper._internal();
+
+  factory DailyChallengeDatabaseHelper() {
+    return _instance;
+  }
+
+  DailyChallengeDatabaseHelper._internal();
+
+  static Database? _database;
+  Future<Database?> get database async {
+    if (_database != null) {
+      
+      return _database;
+    }
+    _database = await initDatabase();
+
+    return _database;
+  }
+
+  Future<Database> initDatabase() async {
+    String path = join(await getDatabasesPath(), "daily_challenge3.db");
+    print('init');
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE daily_challenge_table3(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+           date INTEGER UNIQUE,
+           streak_count INTEGER,
+           accuracy_rate INTEGER
+          )
+        ''');
+      },
+    );
+  }
+
+  Future<void> insertData(int accuracyRate) async {
+    var streakCount;
+    final Database? db = await database;
+    DateTime today = DateTime.now();
+// 前日を求める
+    DateTime yesterday = today.subtract(Duration(days: 1));
+
+// データベースに保存する形式に変換 (YYYYMMDD形式)
+    int todayAsInt = today.year * 10000 + today.month * 100 + today.day;
+    int yesterdayAsInt =
+        yesterday.year * 10000 + yesterday.month * 100 + yesterday.day;
+    int? previousDayAsInt = await getPreviousDate();
+
+    if (yesterdayAsInt != previousDayAsInt) {
+      streakCount = 1;
+    } else {
+      streakCount++;
+    }
+    Map<String, dynamic> data = {
+      'date': todayAsInt,
+      'streak_count': streakCount,
+      'accuracy_rate': accuracyRate,
+    };
+    await db!.insert('daily_challenge_table3', data,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<int?> getPreviousDate() async {
+    final Database? db = await database;
+    List<Map<String, dynamic>> result = await db!.query('daily_challenge_table3',
+        where: 'accuracy_rate IS NOT NULL', orderBy: 'id DESC', limit: 1);
+    if (result.isNotEmpty) {
+      print(result.first);
+      return result.first['date'] as int?;
+    } else {
+      return null; // レコードがない場合
+    }
+  }
+  Future<List<Map>> getAllData() async {
+    final Database? db = await database;
+    return await db!.query('daily_challenge_table3', orderBy: 'id DESC');
+  }
+  Future<int?> getStreakCount() async {
+    final Database? db = await database;
+    List<Map<String, dynamic>> result = await db!.query('daily_challenge_table3',
+        where: 'accuracy_rate IS NOT NULL', orderBy: 'id DESC', limit: 1);
+    if (result.isNotEmpty) {
+      print(result.first);
+      return result.first['streak_count'] as int?;
+    } else {
+      return null; // レコードがない場合
+    }
+  }
+
+  int getTodayAsInt() {
+    DateTime today = DateTime.now();
+    return today.year * 10000 + today.month * 100 + today.day;
   }
 
   Future<int> deleteData(int id) async {

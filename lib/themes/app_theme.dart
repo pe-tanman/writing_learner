@@ -6,10 +6,10 @@ ThemeData appTheme() => ThemeData(
         backgroundColor: AppColors.scaffoldBackgroundColor,
       ),
       useMaterial3: true,
-      textTheme:  const TextTheme(
+      textTheme: const TextTheme(
         titleMedium: TextStyle(
-            fontFamily: 'hiragino',
-            fontSize: 32,
+          fontFamily: 'hiragino',
+          fontSize: 32,
         ),
         headlineMedium: TextStyle(
           fontFamily: 'hiragino',
@@ -41,7 +41,7 @@ ThemeData appTheme() => ThemeData(
         labelStyle: const TextStyle(
           fontSize: 14,
         ),
-      hintStyle: const TextStyle(
+        hintStyle: const TextStyle(
           fontSize: 14,
         ),
         enabledBorder: OutlineInputBorder(
@@ -64,3 +64,34 @@ ThemeData appTheme() => ThemeData(
           ColorScheme.fromSwatch(primarySwatch: AppColors.themeColorPrimary)
               .copyWith(secondary: AppColors.accentColor),
     );
+
+Widget primaryButton(String text, Function onPressed) {
+  return ElevatedButton(
+      style: ElevatedButton.styleFrom(backgroundColor: AppColors.themeColor),
+      onPressed: () {
+        onPressed();
+      },
+      child:  SizedBox(
+          child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 13, horizontal: 60),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+      )));
+}Widget secondaryButton(String text, Function onPressed) {
+  return OutlinedButton(
+      style: OutlinedButton.styleFrom(foregroundColor: AppColors.themeColor),
+      onPressed: () {
+        onPressed();
+      },
+      child:  SizedBox(
+          child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 13, horizontal: 60),
+        child: Text(
+          text,
+          style: TextStyle(color: AppColors.themeColor, fontSize: 20),
+        ),
+      )));
+}
+

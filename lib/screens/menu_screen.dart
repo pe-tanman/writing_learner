@@ -5,6 +5,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:writing_learner/screens/constact_screen.dart';
 import 'package:writing_learner/screens/privacy_policy.dart';
+import 'package:writing_learner/themes/app_theme.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -12,10 +13,10 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
       body: ListView(
         children: <Widget>[
+          Text("メニュー", style: appTheme().textTheme.headlineMedium),
+          SizedBox(height: 20),
           ListTile(
             leading: const Icon(Icons.feedback),
             title: const Text('フィードバックを送信'),

@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
           MainScreen.routeName: (ctx) => const MainScreen(),
           ContactScreen.routeName: (ctx) => const ContactScreen(),
           PolicyScreen.routeName: (ctx) => const PolicyScreen(),
+          
           /*FillingPatternQuestionView.routeName: (ctx) => const FillingPatternQuestionView(),*/
         });
   }

@@ -44,10 +44,9 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                 },
               ),
               const SizedBox(
-                height: 15,
+                height: 30,
               ),
-              ElevatedButton(
-                  onPressed: () async{
+              primaryButton('答え合わせ', ()async{
                     if(ref.read(isAnsweredProvider)){
                       return;
                     }
@@ -58,8 +57,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                     await notifier.addAnswerAndModify(questionNum, answerSentence);
                     ref.read(isAnsweredProvider.notifier).state = true;
                     
-                  },
-                  child: const Text('答え合わせ')),
+                  }),
               Center(
                   child: showAnswer
                       ? Column(

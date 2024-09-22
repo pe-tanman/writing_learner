@@ -231,7 +231,7 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Question: $questionSentence
 Answer:  $answeredSentence
 
-Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified. You must follow the correct expressions in the answer.
+Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified. You must follow the correct grammar and natural expressions in the answer as possible as you can and do not have to modify if the answer is perfect.
 List these: 1. the original parts in Japanese 2. the suggested parts in English  3. the reason type number selected from {
   0: 'スペルミス',
   1: '複数形のミス',
