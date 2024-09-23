@@ -12,11 +12,16 @@ import 'package:writing_learner/screens/proverb_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/screens/review_list_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
-  
+void main() async{
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const ProviderScope(child: MyApp()));
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
