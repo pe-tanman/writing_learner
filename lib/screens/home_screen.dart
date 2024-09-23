@@ -4,6 +4,7 @@ import 'package:writing_learner/provider/database_helper.dart';
 import 'package:writing_learner/screens/daily_challenge.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
+import 'package:writing_learner/screens/w2p_record_screen.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
@@ -62,14 +63,11 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 child: InkWell(
                   onTap: () async {
-                    print('tapped');
                     //クリア済みの時の処理R
                     var previous =
                         await dailyChallengeDatabaseHelper.getPreviousDate();
                     var today =
                         dailyChallengeDatabaseHelper.getTodayAsInt();
-                        print('previous: $previous');
-                        print('today: $today');
                     if (previous == today) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -119,7 +117,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                       'Write to the point',
                       '英訳教材',
                       'lib/assets/blue.png',
-                      W2pQuestionView.routeName,
+                      W2pRecordScreen.routeName,
                       context,
                       ref),
                   _buildItem('AI最難関穴埋め', '和文英訳', 'lib/assets/coming_square.png',

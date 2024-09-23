@@ -89,7 +89,7 @@ class GenerativeService {
             {
               "role": "system",
               "content":
-                  "You are a helpful English Tutor for Japanese Student. Appropriately use Japanese and English following instructions."
+                  "You are a helpful English Tutor for Japanese students. Appropriately use Japanese and English and constraints."
             },
             {"role": "user", "content": prompt}
           ],
@@ -231,24 +231,24 @@ Task: Replace 'reason' with brief reason in Japanese why 'original was modified 
   Question: $questionSentence
 Answer:  $answeredSentence
 
-Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error. You must completely translate the Japanese sentence into English if the answer is incomplete and point out important expressions that need to be modified. You must follow the correct grammar and natural expressions in the answer as possible as you can and do not have to modify if the answer is perfect.
-List these: 1. the original parts in Japanese 2. the suggested parts in English  3. the reason type number selected from {
-  0: 'スペルミス',
-  1: '複数形のミス',
-  2: '三単現のミス',
-  3: '完了形の使用ミス',
-  4: '不定詞の使用ミス',
-  5: '前置詞の使用ミス',
-  6: '冠詞の使用ミス',
-  7: '代名詞の使用ミス',
-  8: '時制のミス',
-  9: 'ニュアンスについて不自然な表現',
-  10: 'あまり使われない不自然な表現',
-  11: '記号の使い方のミス',
-  12: '名詞のミス',
-  13: 'その他のミス'
+Task: Modify the answer to be appropriate as a translation of the Question and point out the reason of the error.
+List these: (1)the original parts in Japanese which should be modified in terms of grammar and natural expression. (2)the parts you suggest modifying in English  (3)the type number why you sugges modification selected from: {
+  0: 'Spelling mistake',
+  1: 'Plural form mistake',
+  2: 'Third-person singular mistake',
+  3: 'Misuse of the perfect tense',
+  4: 'Misuse of the infinitive',
+  5: 'Misuse of a preposition',
+  6: 'Misuse of an article',
+  7: 'Misuse of a pronoun',
+  8: 'Tense mistake',
+  9: 'Awkward expression regarding nuance',
+  10: 'Uncommon awkward expression',
+  11: 'Punctuation mistake',
+  12: 'Noun mistake',
+  13: 'Other mistake'
 }
-4. detailed error reason in Japanese.
+4. detailed reason of modification in Japanese.
 
 
 For example:  "error_array": [

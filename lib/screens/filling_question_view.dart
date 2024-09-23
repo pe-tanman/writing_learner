@@ -30,7 +30,7 @@ class FillingQuestionViewState extends ConsumerState<FillingQuestionView> {
   List<Widget> availableQuestionPages = [];
 
   Future<void> initPages(WidgetRef ref) async {
-    availableQuestionPages.add(const QuestionStartScreen());
+    availableQuestionPages.add( QuestionStartScreen());
     await preloadNextPage(ref, 0);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;

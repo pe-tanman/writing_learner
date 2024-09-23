@@ -6,19 +6,16 @@ import 'package:writing_learner/screens/main_screen.dart';
 import 'package:writing_learner/screens/privacy_policy.dart';
 import 'package:writing_learner/screens/question_view.dart';
 import 'package:writing_learner/screens/review_question_view.dart';
+import 'package:writing_learner/screens/w2p_record_screen.dart';
 import 'package:writing_learner/themes/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:writing_learner/screens/proverb_question_view.dart';
 import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/screens/review_list_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
-void main() async{
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+
+void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -39,6 +36,7 @@ class MyApp extends StatelessWidget {
           FillingQuestionView.routeName: (ctx) => const FillingQuestionView(),
           ProverbQuestionView.routeName: (ctx) => const ProverbQuestionView(),
           W2pQuestionView.routeName: (ctx) => const W2pQuestionView(),
+          W2pRecordScreen.routeName: (ctx) =>  W2pRecordScreen(),
           ReviewQuestionView.routeName: (ctx) => const ReviewQuestionView(),
           ReviewListScreen.routeName: (ctx) =>  ReviewListScreen(),
           DailyChallengeScreen.routeName: (ctx) => const DailyChallengeScreen(),

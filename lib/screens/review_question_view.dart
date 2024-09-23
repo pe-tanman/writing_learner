@@ -34,7 +34,7 @@ class ReviewQuestionViewState extends ConsumerState<ReviewQuestionView> {
 
   Future<void> initPages(WidgetRef ref, BuildContext context) async {
 
-    availableQuestionPages.add(const QuestionStartScreen());
+    availableQuestionPages.add( QuestionStartScreen());
     await preloadNextPage(ref, questionNum, context);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;

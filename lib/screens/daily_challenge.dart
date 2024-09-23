@@ -36,7 +36,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
   List<Widget> availableQuestionPages = [];
 
   Future<void> initPages(WidgetRef ref, BuildContext context) async {
-    availableQuestionPages.add(const QuestionStartScreen());
+    availableQuestionPages.add( QuestionStartScreen());
     await preloadNextPage(ref, questionNum, context);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;

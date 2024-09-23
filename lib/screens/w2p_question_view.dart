@@ -36,7 +36,7 @@ class W2pQuestionViewState extends ConsumerState<W2pQuestionView> {
   List<Widget> availableQuestionPages = [];
 
   Future<void> initPages(WidgetRef ref) async {
-    availableQuestionPages.add(const QuestionStartScreen());
+    availableQuestionPages.add( QuestionStartScreen());
     startQuestionId = await getNextId();
     print("startQuestionId$startQuestionId");
     await preloadNextPage(ref, questionNum + 1);
