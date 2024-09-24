@@ -14,11 +14,10 @@ import 'package:writing_learner/screens/filling_question_view.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/screens/review_list_screen.dart';
 
-
 void main() {
+  
   runApp(const ProviderScope(child: MyApp()));
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
