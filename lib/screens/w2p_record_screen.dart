@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:writing_learner/provider/database_helper.dart';
-import 'package:writing_learner/provider/emoji_converter.dart';
 import 'package:writing_learner/screens/w2p_question_view.dart';
 import 'package:writing_learner/themes/app_color.dart';
 import 'package:writing_learner/themes/app_theme.dart';

@@ -1,4 +1,4 @@
-package com.wridge.wridge
+package com.wridgeDevTeam.wridge
 
 import io.flutter.embedding.android.FlutterActivity
 

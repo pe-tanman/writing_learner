@@ -57,6 +57,7 @@ class QuestionPageState extends ConsumerState<QuestionPage> {
                     ref.read(isAnsweredProvider.notifier).state = true;
                     
                   }),
+                  const SizedBox(height: 20,),
               Center(
                   child: showAnswer
                       ? Column(

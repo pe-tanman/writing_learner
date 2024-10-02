@@ -13,6 +13,7 @@ import 'package:writing_learner/provider/question_provider.dart';
 import 'package:writing_learner/widgets/loading_indicator.dart';
 import 'package:writing_learner/provider/database_helper.dart';
 import 'dart:math' as math;
+import 'package:writing_learner/utilities/generative_service.dart';
 
 class DailyChallengeScreen extends ConsumerStatefulWidget {
   const DailyChallengeScreen({super.key});
@@ -36,7 +37,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
   List<Widget> availableQuestionPages = [];
 
   Future<void> initPages(WidgetRef ref, BuildContext context) async {
-    availableQuestionPages.add( QuestionStartScreen());
+    availableQuestionPages.add(QuestionStartScreen());
     await preloadNextPage(ref, questionNum, context);
     ref.read(isAnsweredProvider.notifier).state = true;
     isInit = false;
@@ -56,15 +57,10 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     int questionNumInCurrentSession = nextQuestionNum % 3;
     if (questionMaps.length <= questionNum) {
       if (questionMaps.isEmpty) {
-        questionMap = questionMaps[questionNum];
-        var random = math.Random();
-        currentMaterialId = random.nextInt(materialMaps.length - 1);
-        var randomQuestions = await dbHelper.getRandomData();
-        questionSentence = randomQuestions[0]['question_sentence'];
+        questionSentence =
+            await GenerativeService().generateTranslationQuestion('Tokyo');
+        currentMaterialId = 1;
       }
-      availableQuestionPages.add(QuestionResultScreen(null, nextQuestionNum,
-          nextQuestionNum - questionNumInCurrentSession, nextQuestionNum, true));
-      return;
     } else {
       questionMap = questionMaps[questionNum];
       questionSentence = questionMap['question_sentence'];
@@ -74,7 +70,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
     ref
         .read(questionDataProvider.notifier)
         .addQuestionSentence(currentMaterialId, questionSentence);
-        print('nextQuestionNum$nextQuestionNum');
+    print('nextQuestionNum$nextQuestionNum');
     availableQuestionPages.add(QuestionPage(questionNum: nextQuestionNum));
   }
 
@@ -99,7 +95,7 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
             ? LoadingIndicator()
             : NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification notification) {
-                 if (notification is ScrollUpdateNotification &&
+                  if (notification is ScrollUpdateNotification &&
                       notification.metrics is PageMetrics) {
                     PageMetrics metrics = notification.metrics as PageMetrics;
                     int nextPage = metrics.page!.round();
@@ -110,7 +106,8 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                       print('back');
                       return true;
                     } else if (metrics.page! > currentPage.toDouble() &&
-                        !ref.watch(isAnsweredProvider)|| currentPage == 4) {
+                            !ref.watch(isAnsweredProvider) ||
+                        currentPage == 4) {
                       _pageController.jumpToPage(currentPage);
                       print('prohibited');
                       return true;
@@ -121,14 +118,14 @@ class DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                 child: PageView(
                   scrollDirection: Axis.horizontal,
                   controller: _pageController,
-                   onPageChanged: (int page) async {
+                  onPageChanged: (int page) async {
                     if (page % 4 != 0) {
                       questionNum++;
                     }
 
                     if ((page + 1) % 4 == 0) {
-                      availableQuestionPages.add(QuestionResultScreen(
-                          null, 0, 0, 2, true));
+                      availableQuestionPages
+                          .add(QuestionResultScreen(null, 0, 0, 2, true));
                     } else {
                       await preloadNextPage(ref, questionNum, context);
                     }

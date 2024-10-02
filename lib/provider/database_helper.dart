@@ -95,13 +95,27 @@ class QuestionDatabaseHelper {
     final Database? db = await database;
     var random = math.Random();
     MaterialDatabaseHelper materialDatabaseHelper = MaterialDatabaseHelper();
+    
+    print('Fetching all materials...');
     var materialMaps = await materialDatabaseHelper.getAllData();
-    var materialId = random.nextInt(materialMaps.length - 1);
+    print('Materials fetched: $materialMaps');
+    
+    var materialId = random.nextInt(2)+1;
+    print('Selected material ID: $materialId');
+    
     var questionId = materialMaps[materialId]['next_number'];
-    materialDatabaseHelper.updateNextNumber(materialId, questionId + 1);
-    return await db!.query('question_table',
+    print('Selected question number: $questionId');
+    
+    print('Updating next number for material ID: $materialId');
+    await materialDatabaseHelper.updateNextNumber(materialId, questionId + 1);
+    
+    print('Fetching question data for material ID: $materialId and question number: $questionId');
+    var result = await db!.query('question_table',
         where: 'material_id = ? and question_number = ?',
         whereArgs: [materialId, questionId]);
+    print('Question data fetched: $result');
+    
+    return result;
   }
 
   Future<void> insertData(materialId, questionNumber, questionSentence,

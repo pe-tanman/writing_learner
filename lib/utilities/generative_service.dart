@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert' as convert;
 import 'package:vector_math/vector_math.dart';
 
-
 import 'package:http/http.dart' as http;
 
 class GenerativeService {
@@ -195,6 +194,8 @@ class GenerativeService {
           "調理は、事実上、噛んで消化するという作業の一部を引き受け、外部のエネルギー源を用いて、われわれの身体の外部で、それを遂行してくれたのである。";
     } else if (levelStr == 'Nagoya') {
       example = '趣味に専念することによって、より深い人生観が生まれるのです';
+    } else if (levelStr == 'Standard') {
+      example = '彼はその問題について深く考え、最終的に解決策を見つけた。';
     }
     var prompt =
         'Task: Generate Japanse sentence for a translation(Japanese to English) task in $levelStr University entrance exam. Example:$example  Note: You must output only the Japanese question sentence without any reaction.';
@@ -250,6 +251,7 @@ List these: (1)the original parts in Japanese which should be modified in terms 
 }
 4. detailed reason of modification in Japanese.
 
+Constraints: The answer should be appropriate as a translation of the Question and point out the reason of the error. The modified answer must be in English, and the reason must be in Japanese.
 
 For example:  "error_array": [
     {

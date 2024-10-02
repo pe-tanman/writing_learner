@@ -113,6 +113,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   _buildItem('AI最難関英訳', '和文英訳', 'lib/assets/blue.png',
                       QuestionView.routeName, context, ref, 'Tokyo'),
+                      _buildItem('AI標準英訳', '和文英訳', 'lib/assets/blue.png',
+                      QuestionView.routeName, context, ref, 'Standard'),
                   _buildItem(
                       'Write to the point',
                       '英訳教材',
@@ -180,7 +182,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppColors.lightText1,
                         ),
